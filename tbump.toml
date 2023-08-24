@@ -30,16 +30,6 @@ search = '\(v{current_version}\)'
 src = "README.md"
 search = "finite:{current_version}"
 
-[[file]]
-src = "manual.typ"
-search = 'version:\s*"{current_version}",'
-[[file]]
-src = "manual.typ"
-search = 'codelst:{current_version}'
-[[file]]
-src = "manual.typ"
-search = 'codelst-{current_version}'
-
 [[before_commit]]
 name = "compile manual"
 cmd = "typst c manual.typ"
