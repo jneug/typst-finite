@@ -1,8 +1,9 @@
-#import "@preview/t4t:0.2.0": is, assert, def
+#import "@preview/t4t:0.3.0": is, assert, def
 #import "@preview/cetz:0.0.2"
 
 #import "./draw.typ"
 #import "./layout.typ"
+
 
 /// Draw an automaton from a transition table.
 ///
@@ -26,8 +27,8 @@
   layout: layout.linear,
   ..canvas-styles
 ) = {
-  assert.that(is.dict(states), message:"Need a dictionary with state and transition information. Got " + repr(states))
-
+  assert.that(is.dict(states),
+    message: (v) => "Need a dictionary with state and transition information. Got " + repr(v))
   if is.a(start) {
     start = states.keys().first()
   }
@@ -47,10 +48,8 @@
       transition: style.at("transition", default:(:))
     )
 
-    //for (i, name) in states.keys().enumerate() {
     for (name, pos) in positions {
       state(
-        // positions.at(name),
         pos,
         name,
         label: label-format(name, state:true),
@@ -103,7 +102,8 @@
   stop: auto,
   format: (col, v) => raw(str(v))
 ) = {
-  assert.that(is.dict(states), message:"Need a dictionary with state and transition information. Got " + repr(states))
+  assert.that(is.dict(states),
+    message: (v) => "Need a dictionary with state and transition information. Got " + repr(v))
 
   if is.a(start) {
     start = states.keys().first()
@@ -163,7 +163,8 @@
   stop: auto,
   format: (col, v) => raw(str(v))
 ) = {
-  assert.that(is.dict(states), message:"Need a dictionary with state and transition information. Got " + repr(states))
+  assert.that(is.dict(states),
+    message: (v) => "Need a dictionary with state and transition information. Got " + repr(v))
 
   if is.a(start) {
     start = states.keys().first()
@@ -188,7 +189,6 @@
           table-cnt.push(format(2, name))
         }
       }
-      // table-cnt.push(transitions.pairs().map(((s, l)) => [#s (#{def.as-arr(l).map(str).join(",")})]).join(", "))
     }
   }
 

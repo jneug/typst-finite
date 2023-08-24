@@ -1,16 +1,17 @@
-// Imports cetz and t4t
+// imports cetz and t4t
 #import "./util.typ": *
 
 /// Draw a state at the given #arg[position].
 #let state(position, name, label:auto, start:false, stop:false, anchor:"center", ..style) = {
-  assert.eq(style.pos(), (), message: "Unexpected positional arguments: " + repr(style.pos()))
+  assert.no-pos(style)
+
   let style = style.named()
   if not is.dict(label) {
     style.insert("label", (text:label))
   } else {
     style.insert("label", label)
   }
-  if "text" not in style.label or style.label.text == auto {
+  if "text" not in style.label or is.a(style.label.text) {
     style.label.insert("text", name)
   }
   if start == true {
@@ -40,11 +41,10 @@
     },
     render: (ctx, center) => {
       let style = styles.resolve(ctx.style, style, root: "state")
-      let (x, y, z) = center
       let (rx, ry) = util.resolve-radius(style.radius).map(util.resolve-number.with(ctx))
-      cmd.ellipse(x, y, z, rx, ry, fill: style.fill, stroke: style.stroke)
+      cmd.ellipse(..center, rx, ry, fill: style.fill, stroke: style.stroke)
 
-      if label not in ("", []) {
+      if not is.empty(label) {
         (draw.content(
           name + ".center",
           fit-content(
@@ -59,7 +59,7 @@
       // Mark state as final
       if stop {
         let thickness = util.resolve-number(ctx, get.stroke-thickness(style.stroke))
-        cmd.ellipse(x, y, z, (rx - thickness)*.9, (ry - thickness)*.9, fill: none, stroke: style.stroke)
+        cmd.ellipse(..center, (rx - thickness)*.9, (ry - thickness)*.9, fill: none, stroke: style.stroke)
       }
 
       // Draw arrow to mark start state
@@ -91,10 +91,16 @@
 ///
 /// The two states #arg[from] and #arg[to] have to be drawn first.
 #let transition( from, to, label: none, ..style ) = {
+  assert.no-pos(style)
   let style = style.named()
+
+  assert.all-of-type("string", from, to)
   let name = from + "-" + to
 
   if is.not-empty(label) {
+    if is.arr(label) {
+      label = label.map(str).join(",")
+    }
     if not is.dict(label) {
       style.insert("label", (text:label))
     } else {
@@ -102,15 +108,17 @@
     }
   }
 
-  let t = (from, to).map(coordinate.resolve-system)
+  let coords = (
+    from + ".center",
+    from + ".right",
+    to + ".left",
+    to + ".center"
+  )
+
+  let t = coords.map(coordinate.resolve-system)
   return ((
     name: name,
-    coordinates: (
-      from + ".center",
-      from + ".right",
-      to + ".left",
-      to + ".center"
-    ),
+    coordinates: coords,
     add-default-anchors: false,
     custom-anchors-ctx: (ctx, sc, sr, el, ec) => {
       let style = styles.resolve(ctx.style, style, root: "transition")
@@ -154,7 +162,7 @@
         vector.sub(end, dir), end,
         ">",
         fill: get.stroke-paint(style.stroke),
-        stroke: style.stroke
+        stroke: get.stroke-thickness(style.stroke) + get.stroke-paint(style.stroke)
       )
       if is.not-empty(l.text) {
         if is.a(l.size) {
@@ -190,8 +198,8 @@
 }
 
 #let transitions( states, ..style ) = {
+  assert.no-pos(style)
   style = style.named()
-
 
   for (from, transitions) in states {
     for (to, label) in transitions {

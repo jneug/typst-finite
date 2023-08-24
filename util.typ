@@ -1,4 +1,4 @@
-#import "@preview/t4t:0.2.0": get, is, assert, math
+#import "@preview/t4t:0.3.0": get, def, is, assert, math
 
 #import "@preview/cetz:0.0.2": vector, draw
 #import draw: util, styles, cmd, coordinate
@@ -170,28 +170,24 @@
 /// - size (length,auto): The initial text size.
 /// - min-size (length): The minimal text size to set.
 #let fit-content( ctx, width, height, content, size:auto, min-size:6pt ) = {
-  let s = if is.a(size) {
-    ctx.length
-  } else {
-    size
-  }
+  let s = def.if-auto(ctx.length, size)
 
   let m = (width: 2*width, height: 2*height)
   while (m.height > height or m.width > height) and s > min-size {
     s = s*.88
     m = measure({set text(s); content}, ctx.typst-style)
   }
-  if s < min-size {
-    s = min-size
-  }
+  s = calc.max(min-size, s)
   {set text(s); content}
 }
 
 /// Prepares the CeTZ context for use with finite
 #let prepare-ctx(ctx) = {
   if "finite" not in ctx {
+    // supposed to store state information at some point
     ctx.insert("finite", (states:()))
 
+    // add default state styles to context
     if "state" not in ctx.style {
       ctx.style.insert("state", default-style.state)
     } else {
@@ -201,6 +197,7 @@
       ctx.style.state = styles.resolve(default-style.state, ctx.style.state)
     }
 
+    // add default transition styles to context
     if "transition" not in ctx.style {
       ctx.style.insert("transition", default-style.transition)
     } else {
