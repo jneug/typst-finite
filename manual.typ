@@ -225,14 +225,14 @@ This example arranges the states in a wave:
 #example[```
 #let wave-layout(
   states, start, stop,
-  x: 1.6, amp: 1, peri: 1,
+  x: 1.6, amp: 1,
   generator: calc.sin
 ) = {
   let positions = (:)
 
   for (i, state) in states.keys().enumerate() {
     positions.insert(state, (
-      i * x, peri * generator(2 * calc.pi * i * (1/amp))
+      i * x, generator(i * amp)
     ))
   }
 
@@ -253,13 +253,13 @@ This example arranges the states in a wave:
   ),
   automaton(
     aut,
-    layout: wave-layout.with(generator: calc.cos, x:.8, amp:2, peri:.8),
+    layout: wave-layout.with(generator: calc.cos, x:.8, amp:1.4),
     style: (state: (radius: .4))
   )
 )
 ```]
 
-
+/*
 #let aut = (:)
 #for i in range(15) {
   let name = "q"+str(i)
@@ -305,6 +305,7 @@ This example arranges the states in a wave:
     q0:(start:top+left)
   )
 )
+*/
 
 == Utility functions
 #tidy-module(
