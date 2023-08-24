@@ -6,4 +6,4 @@ authors = ["Jonas Neugebauer"]
 license = "MIT"
 description = "Typst-setting finite automata with CeTZ"
 repository = "https://github.com/jneug/typst-finite"
-exclude = ["example.typ", "example.pdf", "manual.typ", "manual.pdf"]
+exclude = ["example.typ", "example.pdf", "manual.typ", "manual.pdf", "assets"]
