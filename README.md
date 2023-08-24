@@ -1,6 +1,6 @@
 # finite (v0.0.0)
 
-**finite** is a [Typst](https://github.com/typst/typst) package for rendering finite autoamta on top of [CeTZ](https://github.com/johannes-wolf/typst-canvas).
+**finite** is a [Typst](https://github.com/typst/typst) package for rendering finite automata on top of [CeTZ](https://github.com/johannes-wolf/typst-canvas).
 
 ## Changelog
 
