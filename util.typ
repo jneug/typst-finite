@@ -239,6 +239,21 @@
 
   return ttable
 }
+
+#let get-inputs(table, transposed:true) = {
+  if transposed {
+    table = transpose-table(table)
+  }
+  let inputs = ()
+  for (_, values) in table {
+    for (inp, _) in values {
+      if inp not in inputs {
+        inputs.push(inp)
+      }
+    }
+  }
+  return inputs
+}
 // Unused
 
 #let calc-bounds( positions ) = {
