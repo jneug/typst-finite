@@ -3,6 +3,7 @@
 
 #import "./draw.typ"
 #import "./layout.typ"
+#import "./util.typ": transpose-table, get-inputs
 
 
 /// Draw an automaton from a transition table.
@@ -115,13 +116,13 @@
 ///
 /// The format for #arg[states] is the same as for @@automaton.
 ///
-/// #example[```
+/// #example(```
 /// #finite.transition-table((
 ///   q0: (q1: 0, q0: (1,0)),
 ///   q1: (q0: 1, q2: (1,0)),
 ///   q2: (q0: 1, q2: 0),
 /// ))
-/// ```]
+/// ```)
 ///
 /// - states (dictionary): A dictionary of dictionaries, defining the transition table of an automaton.
 /// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
@@ -192,4 +193,90 @@
     [], ..inputs,
     ..table-cnt
   )
+}
+
+#let powerset(
+  table,
+  initial: auto,
+  final: auto,
+  transposed: true,
+  state-names: (states) => states.join(",")
+) = {
+  if transposed {
+    table = transpose-table(table)
+  }
+  let inputs = get-inputs(table, transposed:false)
+
+  if is.a(initial) {
+    initial = table.keys().first()
+  }
+  if is.a(final) {
+    final = (table.keys().last(),)
+  } else {
+    final = def.as-arr(final)
+  }
+
+  let powerset = (:)
+  let queue = ((initial,),)
+  while queue.len() > 0 {
+    let cur = queue.remove(0)
+    let key = state-names(cur)
+
+    if key not in powerset {
+      powerset.insert(key, (:))
+
+      let trans = ()
+      for inp in inputs {
+        for s in cur {
+          if inp in table.at(s).keys() {
+            trans += table.at(s).at(inp)
+            trans = trans.dedup()
+          }
+        }
+        powerset.at(key).insert(inp, trans)
+        queue.push(trans)
+      }
+    }
+  }
+
+  for (s, t) in powerset {
+    for (i, states) in t {
+      powerset.at(s).at(i) = state-names(states)
+    }
+  }
+
+  if transposed {
+    powerset = transpose-table(powerset)
+  }
+  return powerset
+}
+
+#let add-trap(table, transposed:true, trap-name: "TRAP") = {
+  if transposed {
+    table = transpose-table(table)
+  }
+
+  let trap-added = false
+  let inputs = get-inputs(table, transposed: false)
+  for (s, values) in table {
+    for inp in inputs {
+      if inp not in values {
+        values.insert(inp, (trap-name,))
+        trap-added = true
+      }
+    }
+    table.at(s) = values
+  }
+
+  if trap-added {
+    table.insert(trap-name, inputs.fold((:), (d,i) => {
+      d.insert(i, (trap-name,))
+      return d
+    }))
+  }
+
+  if transposed {
+    table = transpose-table(table)
+  }
+  return table
 }
