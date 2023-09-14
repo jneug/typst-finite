@@ -1,7 +1,7 @@
 
 #import "@local/mantys:0.0.3": *
 
-#import "@preview/cetz:0.1.0"
+#import "@preview/cetz:0.1.1"
 #import "finite.typ"
 
 #let module-scope = (
@@ -407,3 +407,42 @@ Since transition diagrams are effectvely graphs, FINITE could also be used to dr
     C-E: (curve: -1.2))
 })
 ```]
+
+= Showcase
+
+// #example[```
+// #finite.automaton((
+//     q0: (q1: 0, q2: 0),
+//     q2: (q3: 1, q4: 0),
+//     q4: (q2: 0, q5: 0, q6: 0),
+//     q6: (q7: 1),
+//     q1: (q3: 1, q4: 0),
+//     q3: (q1: 1, q5: 1, q6: 1),
+//     q5: (q7: 1),
+//     q7: ()
+//   ),
+//   layout: finite.layout.group.with(grouping: (
+//       ("q0",),
+//       ("q1", "q2", "q3", "q4", "q5", "q6"),
+//       ("q7",)
+//     ),
+//     spacing: 2,
+//     layout: (
+//       finite.layout.linear,
+//       finite.layout.grid.with(columns:3, spacing:2.6),
+//       finite.layout.linear
+//     )
+//   ),
+//   style: (
+//     transition: (curve: 0),
+//     q1-q3: (curve:1),
+//     q3-q1: (curve:1),
+//     q2-q4: (curve:1),
+//     q4-q2: (curve:1),
+//     q1-q4: (label: (pos:.75)),
+//     q2-q3: (label: (pos:.75, dist:-.33)),
+//     q3-q6: (label: (pos:.75)),
+//     q4-q5: (label: (pos:.75, dist:-.33))
+//   )
+// )
+// ```]

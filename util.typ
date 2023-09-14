@@ -1,6 +1,6 @@
 #import "@preview/t4t:0.3.0": get, def, is, assert, math
 
-#import "@preview/cetz:0.0.2": vector, matrix, draw
+#import "@preview/cetz:0.1.1": vector, matrix, draw
 #import draw: util, styles, cmd, coordinate
 #import util.bezier: quadratic-point, quadratic-derivative
 

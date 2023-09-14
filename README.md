@@ -26,7 +26,7 @@ The output should look like this:
 
 ## Further documentation
 
-See `manual.pdf` for a full manual of the package. 
+See `manual.pdf` for a full manual of the package.
 
 ## Development
 
@@ -35,6 +35,10 @@ The documentation is created using [Mantys](https://github.com/jneug/typst-manty
 To compile the manual, Mantys needs to be available as a local package. Refer to Mantys' manual for instructions on how to do so.
 
 ## Changelog
+
+### Version 0.2.0
+
+- Bumped CeTZ to v0.1.1
 
 ### Version 0.1.0
 

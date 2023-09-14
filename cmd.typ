@@ -1,5 +1,5 @@
 #import "@preview/t4t:0.3.0": is, assert, def
-#import "@preview/cetz:0.0.2"
+#import "@preview/cetz:0.1.1"
 
 #import "./draw.typ"
 #import "./layout.typ"

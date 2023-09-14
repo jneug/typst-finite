@@ -3,6 +3,7 @@
 
 #import "layout.typ"
 
+
 /// Draw a state at the given #arg[position].
 ///
 /// #example[```
@@ -64,15 +65,18 @@
       cmd.ellipse(..center, rx, ry, fill: style.fill, stroke: style.stroke)
 
       if not is.empty(label) {
-        (draw.content(
-          name + ".center",
+        let cnt = draw.content(
+          // name + ".center",
+          center,
           fit-content(
             ctx,
             rx*.9 * ctx.length, ry*.9 * ctx.length,
             style.label.text,
             size: style.label.size
-          )
-        ).first().render)(ctx, center, center)
+          ),
+          frame: none
+        ).first()
+        (cnt.render)(ctx, ..(cnt.transform-coordinates)(ctx, ..cnt.coordinates))
       }
 
       // Mark state as final
@@ -249,7 +253,7 @@
           },
           {set text(l.size, l.color); l.text;}
         ).first()
-        (cnt.render)(ctx, ..cnt.coordinates)
+        (cnt.render)(ctx, ..(cnt.transform-coordinates)(ctx, ..cnt.coordinates))
       }
     }
   ),)
@@ -271,7 +275,9 @@
       transition(
         from,
         to,
+        inputs: label,
         label: label,
+        ..style.at("transition", default:(:)),
         ..style.at(name, default:(:))
       )
     }
