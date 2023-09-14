@@ -218,6 +218,27 @@
 }
 
 
+#let transpose-table(table) = {
+  let ttable = (:)
+  for (key, values) in table {
+    let new-values = (:)
+
+    for (kk, vv) in values {
+      for i in def.as-arr(vv) {
+        i = str(i)
+        if i not in new-values {
+          new-values.insert(str(i), (kk,))
+        } else {
+          new-values.at(str(i)).push(kk)
+        }
+      }
+    }
+
+    ttable.insert(key, new-values)
+  }
+
+  return ttable
+}
 // Unused
 
 #let calc-bounds( positions ) = {
