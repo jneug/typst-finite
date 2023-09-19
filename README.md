@@ -36,9 +36,15 @@ To compile the manual, Mantys needs to be available as a local package. Refer to
 
 ## Changelog
 
+### Version 0.3.0
+
+- Bumped tools4typst to v0.3.2.
+- Added `#powerset` command, to transform a NFA into a DFA.
+- Added `utils.transpose-table` and `utils.get-inputs` utilities.
+
 ### Version 0.2.0
 
-- Bumped CeTZ to v0.1.1
+- Bumped CeTZ to v0.1.1.
 
 ### Version 0.1.0
 
