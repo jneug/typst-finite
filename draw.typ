@@ -117,6 +117,7 @@
   ),)
 }
 
+
 /// Draw a transition between two states.
 ///
 /// The two states #arg[from] and #arg[to] have to be existing names of states.
@@ -138,8 +139,9 @@
 /// - label (string,content,auto,dictionary): A label for the transition. For #value(auto)
 ///    the #arg[input] symbols are joined with commas. Can be a #dtype("dictionary") with
 ///    a `text` and additional styling keys.
+/// - anchor (alignment): Anchor for loops. Has no effect on normal transitions.
 /// - ..style (any): Styling options.
-#let transition( from, to, inputs: none, label: auto, ..style ) = {
+#let transition( from, to, inputs: none, label: auto, anchor: top, ..style ) = {
   assert.no-pos(style)
   let style = style.named()
 
@@ -186,44 +188,51 @@
       let style = styles.resolve(ctx.style, style, root: "transition")
 
       if style.curve == left {
-        style.curve = util.default-style.transition.curve * -1
+        style.curve = default-style.transition.curve * -1
       }
 
-      let (start, end, ctrl) = transition-pts(
+      let (start, end, c1, c2) = transition-pts(
         sc, ec,
         sr.at(0) - sc.at(0),
         ec.at(0) - el.at(0),
-        curve: style.curve
+        curve: style.curve,
+        anchor: anchor
       )
 
       return (
-        center: quadratic-point(start, end, ctrl, 0.5),
+        center: mid-point(start, end, c1, c2),
         start: start,
         end: end,
-        ctrl: ctrl,
-        label: label-pt(start, end, ctrl, style, loop:sc==ec)
+        ctrl1: c1,
+        ctrl2: c2,
+        label: label-pt(start, end, c1, c2, style, loop:sc==ec)
       )
     },
     render: (ctx, sc, sr, el, ec) => {
       let style = styles.resolve(ctx.style, style, root: "transition")
       let l = style.label
 
-      let (start, end, ctrl) = transition-pts(
+      if style.curve == left {
+        style.curve = default-style.transition.curve * -1
+      }
+
+      let (start, end, c1, c2) = transition-pts(
         sc, ec,
         sr.at(0) - sc.at(0),
         ec.at(0) - el.at(0),
-        curve: style.curve
+        curve: style.curve,
+        anchor: anchor
       )
 
-      let c1 = vector.add(start, vector.scale(vector.sub(ctrl, start), 2/3))
-      let c2 = vector.add(end, vector.scale(vector.sub(ctrl, end), 2/3))
+      // let c1 = vector.add(start, vector.scale(vector.sub(ctrl, start), 2/3))
+      // let c2 = vector.add(end, vector.scale(vector.sub(ctrl, end), 2/3))
 
       cmd.path(
         ("cubic", start, end, c1, c2),
         stroke: style.stroke
       )
 
-      let dir = mark-dir(start, end, ctrl, scale:ctx.style.mark.size)
+      let dir = mark-dir(start, end, c1, c2, scale:ctx.style.mark.size)
       cmd.mark(
         vector.sub(end, dir), end,
         ">",
@@ -240,7 +249,7 @@
           l.color = get.stroke-paint(style.stroke)
         }
 
-        let label-pt = label-pt(start, end, ctrl, style, loop:sc==ec)
+        let label-pt = label-pt(start, end, c1, c2, style, loop:sc==ec)
         let cnt = draw.content(
           label-pt,
           angle: if type(l.angle) == "angle" {
@@ -248,7 +257,7 @@
           } else if sc == ec {
             0deg
           } else {
-            let d = quadratic-derivative(start, end, ctrl, l.pos)
+            let d = cubic-derivative(start, end, c1, c2, l.pos)
             let a = vector.angle2((0,0), d)
             if a > 90deg and a < 270deg {
               a = vector.angle2((0,0), vector.scale(d, -1))

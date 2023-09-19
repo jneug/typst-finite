@@ -1,8 +1,8 @@
-#import "@preview/t4t:0.3.0": get, def, is, assert, math
+#import "@preview/t4t:0.3.2": get, def, is, assert, math
 
 #import "@preview/cetz:0.1.1": vector, matrix, draw
 #import draw: util, styles, cmd, coordinate
-#import util.bezier: quadratic-point, quadratic-derivative
+#import util.bezier: cubic-point, cubic-derivative, cubic-through-3points
 
 // =================================
 //  Defaults
@@ -20,7 +20,7 @@
     )
   ),
   transition: (
-    curve: 1.0,
+    curve: .75,
     stroke: auto,
 
     label: (
@@ -38,7 +38,7 @@
 //  Vectors
 // =================================
 
-/// Set the length of a vactor.
+/// Set the length of a vector.
 #let vector-set-len(v, len) = if vector.len(v) == 0 {
   return v
 } else {
@@ -58,14 +58,25 @@
   return vector.norm(v)
 }
 
+/// Rotates a vector by #arg[angle] degree around the origin.
+///
+/// >>> vector-rotate((1,0), 90deg) == (0, 1)
+#let vector-rotate(vec, angle) = {
+  let (x, y, ..) = vec
+  return (
+    calc.cos(angle) * x - calc.sin(angle) * y,
+    calc.sin(angle) * x + calc.cos(angle) * y
+  )
+}
+
 
 // =================================
 //  Bezier
 // =================================
 
-/// Compute a normal vector for a point on a quadratic bezier curve.
-#let quadratic-normal(a, b, c, t) = {
-  let qd = quadratic-derivative(a, b, c, t)
+/// Compute a normal vector for a point on a cubic bezier curve.
+#let cubic-normal(a, b, c, d, t) = {
+  let qd = cubic-derivative(a, b, c, d, t)
   if vector.len(qd) == 0 {
     return (0, 1, 0)
   } else {
@@ -74,45 +85,85 @@
 }
 
 /// Compute the mid point of a quadratic bezier curve.
-#let mid-point(a, b, c) = quadratic-point(a, b, c, .5)
+#let mid-point(a, b, c, d) = cubic-point(a, b, c, d, .5)
 
 
 // =================================
 //  Helpers
 // =================================
 
-/// Calculate the controlpoint for a transition.
-#let ctrl-pt(a, b, curve:1) = {
+/// Calculate the control point for a transition.
+#let cubic-pts(a, b, curve:1) = {
   let ab = vector.sub(b, a)
-  vector.add(
+  let X = vector.add(
     vector.add(
       a,
       vector.scale(ab, .5)),
     vector.scale(
       vector-normal(ab),
       curve))
+  return cubic-through-3points(a, X, b)
 }
 
 /// Calculate the direction vector for a transition mark (arrowhead)
-#let mark-dir(a, b, c, scale:1) = vector-set-len(quadratic-derivative(a, b, c, 1), scale)
+#let mark-dir(a, b, c, d, scale:1) = vector-set-len(cubic-derivative(a, b, c, d, 1), scale)
 
 /// Calculate the location for a transitions label, based
 /// on its bezier points.
-#let label-pt(a, b, c, style, loop:false) = {
+#let label-pt(a, b, c, d, style, loop:false) = {
   let pos = style.label.at("pos", default:.5)
   let dist = style.label.at("dist", default:.33)
-  let curve = style.label.at("curve", default:1)
+  let curve = style.at("curve", default:1)
 
-  let pt = quadratic-point(a, b, c, pos)
-  let n = quadratic-normal(a, b, c, pos)
+  let pt = cubic-point(a, b, c, d, pos)
+  let n = cubic-normal(a, b, c, d, pos)
 
-  if loop == (curve > 0) {
+  if loop == (curve < 0) {
     dist *= -1
   }
 
   return vector.add(pt,
     vector.scale(n, dist))
 }
+
+
+/// Calculate start, end and ctrl points for a transition loop.
+///
+/// - start (vector): Center of the state.
+/// - start-radius (length): Radius of the state.
+/// - curve (float): Curvature of the transition.
+/// - anchor (alignment): Anchorpoint on the state
+#let loop-pts(start, start-radius, anchor:top, curve:1) = {
+  anchor = vector-set-len(align-to-vec(anchor), start-radius)
+
+  let end = vector.add(
+    start,
+    vector-rotate(anchor, -22.5deg)
+  )
+  let start = vector.add(
+    start,
+    vector-rotate(anchor, 22.5deg)
+  )
+
+  if curve < 0 {
+    (start, end) = (end, start)
+  } else if curve == 0 {
+    curve = start-radius
+  }
+
+  let (start, end, c1, c2) = cubic-pts(start, end, curve:curve)
+
+  if curve < 0 {
+    (c1, c2) = (c2, c1)
+  }
+
+  let d = vector.scale(vector.sub(c2, c1), curve * 4)
+  c1 = vector.sub(c1, d)
+  c2 = vector.add(c2, d)
+
+  return (start, end, c1, c2)
+}
+
 
 /// Calculate start, end and ctrl points for a transition.
 ///
@@ -121,37 +172,18 @@
 /// - start-radius (length): Radius of the start state.
 /// - end-radius (length): Radius of the end state.
 /// - curve (float): Curvature of the transition.
-#let transition-pts(start, end, start-radius, end-radius, curve:1) = {
+#let transition-pts(start, end, start-radius, end-radius, curve:1, anchor:top) = {
   // Is it a loop?
   if start == end {
-    start = vector.add(
-      start,
-      vector-set-len(
-        (1, 2),
-        start-radius))
-    end = vector.add(
-      end,
-      vector-set-len(
-        (1, -2),
-        -end-radius))
-
-    if curve < 0 {
-      (start, end) = (end, start)
-    } else if curve == 0 {
-      curve = start-radius
-    }
-    return (
-      start,
-      end,
-      ctrl-pt(start, end, curve: -2*curve)
-    )
+    return loop-pts(start, start-radius, curve:curve, anchor:anchor)
   } else {
-    let ctrl = ctrl-pt(start, end, curve:curve)
+    let (start, end, ctrl1, ctrl2) = cubic-pts(start, end, curve:curve)
+
     start = vector.add(
       start,
       vector-set-len(
         vector.sub(
-          ctrl,
+          ctrl1,
           start),
         start-radius))
     end = vector.add(
@@ -159,12 +191,13 @@
       vector-set-len(
         vector.sub(
           end,
-          ctrl),
+          ctrl2),
         -end-radius))
     return (
       start,
       end,
-      ctrl
+      ctrl1,
+      ctrl2
     )
   }
 }
