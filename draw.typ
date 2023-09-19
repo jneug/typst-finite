@@ -185,6 +185,10 @@
     custom-anchors-ctx: (ctx, sc, sr, el, ec) => {
       let style = styles.resolve(ctx.style, style, root: "transition")
 
+      if style.curve == left {
+        style.curve = util.default-style.transition.curve * -1
+      }
+
       let (start, end, ctrl) = transition-pts(
         sc, ec,
         sr.at(0) - sc.at(0),
