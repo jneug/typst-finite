@@ -251,18 +251,23 @@
 }
 
 
+// Changes a transition table from the format (`state`: `inputs`) to (`input`: `states`) or vice versa.
 #let transpose-table(table) = {
   let ttable = (:)
   for (key, values) in table {
     let new-values = (:)
 
-    for (kk, vv) in values {
-      for i in def.as-arr(vv) {
-        i = str(i)
-        if i not in new-values {
-          new-values.insert(str(i), (kk,))
-        } else {
-          new-values.at(str(i)).push(kk)
+    if is.not-none(values) {
+      for (kk, vv) in values {
+        for i in def.as-arr(vv) {
+          if is.not-none(i) {
+            i = str(i)
+            if i not in new-values {
+              new-values.insert(i, (kk,))
+            } else {
+              new-values.at(i).push(kk)
+            }
+          }
         }
       }
     }
