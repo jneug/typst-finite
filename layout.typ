@@ -401,7 +401,9 @@
 /// #finite.automaton(
 ///   aut,
 ///   initial: none, final: none,
-///   layout:finite.layout.snake.with(columns:3)
+///   layout:finite.layout.custom.with(positions:(..) => (
+///     q0: (0,0), q1: (0,5), rest:(rel: (2,-1))
+///   ))
 /// )
 /// ```]
 ///
@@ -427,13 +429,14 @@
     let radii = resolve-radii(ctx, body)
     let states = body.filter((e) => "name" in e and "radius" in e)
     let positions = positions(ctx, radii, states)
+    let default = positions.at("rest", default:(rel:(1,0)))
 
     let elements = ()
     for element in body {
       ctx = apply-style(ctx, element)
 
-      if "name" in element and element.name in positions {
-        element.coordinates = (positions.at(element.name),)
+      if "name" in element {
+        element.coordinates = (positions.at(element.name, default:default),)
       }
 
       elements.push(element)
