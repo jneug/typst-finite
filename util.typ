@@ -295,6 +295,45 @@
 
   return inputs.sorted()
 }
+
+/// Creates a full specification for a finite automaton.
+#let to-spec(spec, states:auto, initial:auto, final:auto, inputs:auto) = {
+  if "transitions" not in spec {
+    spec = (transitions: spec)
+  }
+  if "states" not in spec {
+    if is.a(states) {
+      states = spec.transitions.keys()
+    }
+    spec.insert("states", states)
+  }
+  if "initial" not in spec {
+    if is.a(initial) {
+      initial = spec.states.first()
+    }
+    spec.insert("initial", initial)
+  }
+  if "final" not in spec {
+    if is.a(final) {
+      final = spec.states.last()
+    } else if is.n(final) {
+      final = ()
+    }
+    spec.insert("final", final)
+  }
+  if "inputs" not in spec {
+    if is.a(inputs) {
+      inputs = get-inputs(spec.transitions)
+    }
+    spec.insert("inputs", inputs)
+  } else {
+    spec.inputs = spec.inputs.map(str).sorted()
+  }
+  return spec
+}
+
+
+
 // Unused
 
 #let calc-bounds( positions ) = {
