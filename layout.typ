@@ -412,6 +412,9 @@
 ///    The function gets the current CETZ context, a dictionary of computed radii for each
 ///    state and a list with all state elements to position. The returned dictionary
 ///    contains each states name as a key and the new coordinate as a value.
+///
+///    The result may specify a `rest` key that is used as a default coordinate. This makes
+///    sense in combination with a relative coordinate like `(rel:(2,0))`.
 /// - name (string): Name for the element to access later.
 /// - anchor (string): Name of the anchor to use for the layout.
 /// - body (array): Array of CETZ elements to draw.
