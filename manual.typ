@@ -4,9 +4,12 @@
 #import "@preview/cetz:0.1.1"
 #import "finite.typ"
 
+#import "util.typ"
+
 #let module-scope = (
   cetz: cetz,
-  finite: finite
+  finite: finite,
+  util: util
 )
 
 #show "CETZ": a => package[CeTZ]
@@ -40,7 +43,7 @@
 
   examples-scope: (
     cetz: cetz,
-    finite:finite,
+    finite: finite,
     automaton: finite.automaton
   )
 )
@@ -92,7 +95,9 @@ As you can see, an automaton ist defined by a dictionary of dictionaries. The ke
 
 In the example above, the states `q0`, `q1` and `q2` are defined. `q0` is connected to `q1` and has a loop to itself. `q1` transitions to `q2` and back to `q0`. #cmd-[automaton] selected the first state in the dictionary (in this case `q0`) to be the initiat state and the last (`q2`) to be a final state.
 
-To modify the defaults, #cmd-[automaton] accepts a set of options:
+See @aut-specs for more details on how to specify automatons.
+
+To modify how the transition diagram is displayed, #cmd-[automaton] accepts a set of options:
 #example(breakable:true)[```typ
 #automaton(
   (
@@ -102,9 +107,13 @@ To modify the defaults, #cmd-[automaton] accepts a set of options:
   ),
   initial: "q1",
   final: ("q0", "q2"),
+  labels:(
+    q2: "FIN"
+  ),
   style:(
     state: (fill: luma(248), stroke:luma(120)),
     transition: (stroke: (dash:"dashed")),
+    q0-q0: (anchor:top+left),
     q1: (initial:top),
     q1-q2: (stroke: 2pt + red)
   )
@@ -133,6 +142,38 @@ For larger automatons, the states can be arranged in different ways:
 
 See @using-layout for more details about layouts.
 
+== Specifing finite automata <aut-specs>
+
+Most of FINITEs commands expect a finite automaton specification ("spec" in short) as the first argument. These specifications are dictionaries defining the elements of the automaton.
+
+If an automaton has only one final state, the spec can simply be a transition table. In other cases, the specification can explicitly define the various elements.
+
+A specification can have these elements:
+```typc
+(
+  transitions: (...),
+  states: (...),
+  inputs: (...),
+  initial: "...",
+  final: (...)
+)
+```
+
+- `transitions` is a dictionary of dictionary in the format:
+  ```typc
+  (
+    state1: (input1, input2, ...),
+    state2: (input1, input2, ...),
+    ...
+  )
+  ```
+- `states` is an optional array with the names of all states. The keys of `transitions` are used by default.
+- `inputs` is an optional array with all input values. The inputs found in `transitions` are used by default.
+- `initial` is an optional name of the initial state. The first value in `states` is used by default.
+- `final` is an optional array of final states. The last value in `states` is used by default.
+
+The utility function #cmd(module:"util")[to-spec] can be used to create a full spec from a parital dictionary by filling in the missing values with the defaults.
+
 == Command reference
 #tidy-module(
   read("cmd.typ"),
@@ -145,7 +186,7 @@ See @using-layout for more details about layouts.
 
 As common in CETZ, you can pass general styles for states and transitions to the #cetz-cmd-[set-style] function within a call to #cetz-cmd-[canvas]. The elements functions #cmd-[state] and #cmd-[transition] (see below) can take their respective styling options as arguments, to style individual elements.
 
-#arg[automaton] takes a #arg[style] argument that passes the given style to the above functions. The example below sets a background and stroke color for all states and draws transitions with a dashed style. Additionally, the state `q1` has the arrow indicating an initial state drawn from above instead from the left. The transition from `q1` to `q2` is highlighted in red.
+#cmd[automaton] takes a #arg[style] argument that passes the given style to the above functions. The example below sets a background and stroke color for all states and draws transitions with a dashed style. Additionally, the state `q1` has the arrow indicating an initial state drawn from above instead from the left. The transition from `q1` to `q2` is highlighted in red.
 #example(breakable:true)[```typ
 #automaton(
   (
@@ -170,19 +211,19 @@ The supported styling options (and their defaults) are as follows:
 - states:
   / #arg(fill: auto): Background fill for states.
   / #arg(stroke: auto): Stroke for state borders.
-  / #arg(radius: .6): Radius of states.
+  / #arg(radius: .6): Radius of the states circle.
   - `label`:
-    / #arg(text: auto): Default state label.
-    / #arg(size: auto): Default text size for state labels.
+    / #arg(text: auto): State label.
+    / #arg(size: auto): Initial text size for the labels (will be modified to fit the label into the states circle).
 
 - transitions
-  / #arg(curve: 1.0): Curviness of transitions. Set to #value(0) to get straight lines.
+  / #arg(curve: 1.0): "Curviness" of transitions. Set to #value(0) to get straight lines.
   / #arg(stroke: auto): Stroke for transitions.
   - `label`:
-    / #arg(text: ""): Default transition label.
-    / #arg(size: 1em): Default size for label text.
+    / #arg(text: ""): Transition label.
+    / #arg(size: 1em): Size for label text.
     / #arg(color: auto): Color for label text.
-    / #arg(pos: .5): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the initial, #value(1) at the end of the transition.
+    / #arg(pos: .5): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the start, #value(1) at the end of the transition.
     / #arg(dist: .33): Distance of the label from the transition.
     / #arg(angle: auto): Angle of the label text. #value(auto) will set the angle based on the transitions direction.
 

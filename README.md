@@ -39,8 +39,17 @@ To compile the manual, Mantys needs to be available as a local package. Refer to
 ### Version 0.3.0
 
 - Bumped tools4typst to v0.3.2.
+- Introducing automaton specs as a data structure.
 - Added `#powerset` command, to transform a NFA into a DFA.
-- Added `utils.transpose-table` and `utils.get-inputs` utilities.
+- Added `#add-trap` command, to complete a partial DFA.
+- Added `#accepts` command, to test a word against an NFA or DFA.
+- Added `transpose-table` and `get-inputs` utilities.
+- Changed `label-format` argument to `state-format` and `input-format`.
+- Added "Start" label to the mark for initial states.
+	- Added option to modify the mark label for initial states.
+- Added anchor option for loops, to position the loop at one of the eight default anchors.
+- Changed `curve` option to be the height of the arc of the transition.
+	- This makes styling more consistent over longer distances.
 
 ### Version 0.2.0
 
