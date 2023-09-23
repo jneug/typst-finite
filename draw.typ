@@ -17,7 +17,11 @@
 /// - position (coordinate): Position of the states center.
 /// - name (string): Name for the state.
 /// - label (string,content,auto,none): Label for the state. If set to #value(auto), the #arg[name] is used.
-/// - initial (boolean,alignment): Whether this is an initial state.
+/// - initial (boolean,alignment,dictionary): Whether this is an initial state. This can be either
+///   - #value(true),
+///   - an #dtype("alignment") to specify an anchor for the inital marking,
+///   - a #dtype("string") to specify text for the initial marking,
+///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking.
 /// - final (boolean): Whether this is a final state.
 /// - anchor (string): Anchor to use for drawing.
 /// - ..style (any): Styling options.
@@ -34,7 +38,11 @@
     style.label.insert("text", name)
   }
   if initial == true {
-    initial = left
+    initial = (anchor: left, label: "Start")
+  } else if is.align(initial) {
+    initial = (anchor: initial, label: "Start")
+  } else if is.str(initial) {
+    initial = (anchor: left, label: initial)
   }
 
   let t = coordinate.resolve-system(position)
@@ -85,26 +93,49 @@
         cmd.ellipse(..center, (rx - thickness)*.9, (ry - thickness)*.9, fill: none, stroke: style.stroke)
       }
 
-      // Draw arrow to mark start state
+      // Draw arrow to mark initial state
       if initial != false {
+        let align-vec = align-to-vec(initial.anchor)
         let s-end = vector.add(
           center,
-          vector.scale(align-to-vec(initial), rx)
+          vector.scale(align-vec, rx)
         )
         let s-start = vector.add(
           s-end,
-          vector.scale(align-to-vec(initial), rx)
+          vector.scale(align-vec, rx)
         )
         cmd.path(
           ("line", s-start, s-end),
           stroke: style.stroke
         )
         cmd.mark(
-          vector.add(s-end, vector.scale(align-to-vec(initial), ctx.style.mark.size)), s-end,
+          vector.add(s-end, vector.scale(align-vec, ctx.style.mark.size)), s-end,
           ">",
           fill: get.stroke-paint(style.stroke),
           stroke: style.stroke
         )
+        if "label" in initial {
+          let s-label = vector.add(
+            s-start,
+            vector-rotate(
+              vector.scale(
+                align-vec, .2),
+              -90deg
+            )
+          )
+          let cnt = draw.content(
+            s-label,
+            angle: {
+              if initial.anchor in (top, top+right, right, bottom+right) {
+                vector.angle2((0,0), align-vec)
+              } else {
+                vector.angle2(align-vec, (0,0))
+              }
+            },
+            text(.88em, initial.label)
+          ).first()
+          (cnt.render)(ctx, ..(cnt.transform-coordinates)(ctx, ..cnt.coordinates))
+        }
       }
     },
     after: (ctx, ..) => {
@@ -133,7 +164,7 @@
 ///
 /// - from (string): Name of the starting state.
 /// - to (string): Name of the ending state.
-/// - inputs (string,array,none): A list of atomic input symbols for the transition.
+/// - inputs (string,array,none): A list of input symbols for the transition.
 ///    If provided as a #dtype("string"), it is split on commas to get the list of
 ///    input symbols.
 /// - label (string,content,auto,dictionary): A label for the transition. For #value(auto)
@@ -271,6 +302,13 @@
     }
   ),)
 }
+
+
+/// Create a transition loop on a state.
+///
+/// This is a shortcut for @@transition that takes only one
+/// state name instead of two.
+#let loop( state, inputs: none, label: auto, anchor: top, ..style ) = transition(state, state, inputs: inputs, label: label, anchor: anchor, ..style )
 
 
 /// Draws all transitions from a transition table with a common style.

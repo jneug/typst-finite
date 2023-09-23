@@ -59,8 +59,6 @@
 }
 
 /// Rotates a vector by #arg[angle] degree around the origin.
-///
-/// >>> vector-rotate((1,0), 90deg) == (0, 1)
 #let vector-rotate(vec, angle) = {
   let (x, y, ..) = vec
   return (
@@ -94,6 +92,9 @@
 
 /// Calculate the control point for a transition.
 #let cubic-pts(a, b, curve:1) = {
+  if curve == 0 {
+    return (a, b, b, a)
+  }
   let ab = vector.sub(b, a)
   let X = vector.add(
     vector.add(
@@ -111,14 +112,14 @@
 /// Calculate the location for a transitions label, based
 /// on its bezier points.
 #let label-pt(a, b, c, d, style, loop:false) = {
-  let pos = style.label.at("pos", default:.5)
-  let dist = style.label.at("dist", default:.33)
-  let curve = style.at("curve", default:1)
+  let pos = style.label.at("pos", default: default-style.transition.label.pos)
+  let dist = style.label.at("dist", default: default-style.transition.label.dist)
+  let curve = style.at("curve", default: default-style.transition.curve)
 
   let pt = cubic-point(a, b, c, d, pos)
   let n = cubic-normal(a, b, c, d, pos)
 
-  if loop == (curve < 0) {
+  if loop and curve < 0 {
     dist *= -1
   }
 
