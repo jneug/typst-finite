@@ -278,19 +278,22 @@
   return ttable
 }
 
-#let get-inputs(table, transposed:true) = {
-  if transposed {
+/// Gets a list of all inputs from a transition table.
+#let get-inputs(table, transpose:true) = {
+  if transpose {
     table = transpose-table(table)
   }
+
   let inputs = ()
   for (_, values) in table {
     for (inp, _) in values {
       if inp not in inputs {
-        inputs.push(inp)
+        inputs.push(str(inp))
       }
     }
   }
-  return inputs
+
+  return inputs.sorted()
 }
 // Unused
 
