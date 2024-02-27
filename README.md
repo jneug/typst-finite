@@ -36,6 +36,13 @@ To compile the manual, Mantys needs to be available as a local package. Refer to
 
 ## Changelog
 
+### Version 0.3.1
+
+- Added styling options for intial states:
+	- `stroke` sets a stroke for the marking.
+	- `scale` scales the marking by a factor.
+- Updated manual.
+
 ### Version 0.3.0
 
 - Bumped tools4typst to v0.3.2.
