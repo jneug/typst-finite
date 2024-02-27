@@ -1,5 +1,5 @@
 
-#import "@local/mantys:0.0.3": *
+#import "@local/mantys:0.1.0": *
 
 #import "@preview/cetz:0.1.1"
 #import "finite.typ"
