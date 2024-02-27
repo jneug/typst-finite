@@ -266,7 +266,7 @@
 ///
 /// - position (coordinate): Position of the anchor point.
 /// - columns (integer): Number of columns per row.
-/// - spacing (float): Spacing between states on the line.
+/// - spacing (float): Spacing between states on the grid.
 /// - name (string): Name for the element to access later.
 /// - anchor (string): Name of the anchor to use for the layout.
 /// - body (array): Array of CETZ elements to draw.
