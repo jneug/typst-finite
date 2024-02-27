@@ -38,11 +38,11 @@
     style.label.insert("text", name)
   }
   if initial == true {
-    initial = (anchor: left, label: "Start")
+    initial = (:)
   } else if is.align(initial) {
-    initial = (anchor: initial, label: "Start")
+    initial = (anchor: initial)
   } else if is.str(initial) {
-    initial = (anchor: left, label: initial)
+    initial = (label: initial)
   }
 
   let t = coordinate.resolve-system(position)
@@ -95,26 +95,36 @@
 
       // Draw arrow to mark initial state
       if initial != false {
-        let align-vec = align-to-vec(initial.anchor)
+        style.insert("initial", (
+          anchor: left,
+          label: "Start",
+          "stroke": style.stroke,
+          scale: 1
+        ) + initial)
+
+        let thickness = util.resolve-number(ctx, get.stroke-thickness(style.initial.stroke))
+        let color = get.stroke-paint(style.initial.stroke)
+
+        let align-vec = align-to-vec(style.initial.anchor)
         let s-end = vector.add(
           center,
-          vector.scale(align-vec, rx)
+          vector.scale(align-vec, (rx + thickness))
         )
-        let s-start = vector.add(
+        let s-start = vector.scale(vector.add(
           s-end,
           vector.scale(align-vec, rx)
-        )
+        ), style.initial.scale)
         cmd.path(
           ("line", s-start, s-end),
-          stroke: style.stroke
+          stroke: style.initial.stroke
         )
         cmd.mark(
           vector.add(s-end, vector.scale(align-vec, ctx.style.mark.size)), s-end,
           ">",
-          fill: get.stroke-paint(style.stroke),
-          stroke: style.stroke
+          fill: color,
+          stroke: style.initial.stroke
         )
-        if "label" in initial {
+        if "label" in style.initial {
           let s-label = vector.add(
             s-start,
             vector-rotate(
@@ -126,13 +136,13 @@
           let cnt = draw.content(
             s-label,
             angle: {
-              if initial.anchor in (top, top+right, right, bottom+right) {
+              if style.initial.anchor in (top, top+right, right, bottom+right) {
                 vector.angle2((0,0), align-vec)
               } else {
                 vector.angle2(align-vec, (0,0))
               }
             },
-            text(.88em, initial.label)
+            text(.88em, color, style.initial.label)
           ).first()
           (cnt.render)(ctx, ..(cnt.transform-coordinates)(ctx, ..cnt.coordinates))
         }
