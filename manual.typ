@@ -1,16 +1,11 @@
 
 #import "@local/mantys:0.1.0": *
+#import "@local/tidy:0.2.0"
 
 #import "@preview/cetz:0.1.1"
 #import "finite.typ"
 
 #import "util.typ"
-
-#let module-scope = (
-  cetz: cetz,
-  finite: finite,
-  util: util
-)
 
 #show "CETZ": a => package[CeTZ]
 #let cetz-cmd = cmd.with(module:"cetz")
@@ -44,8 +39,18 @@
   examples-scope: (
     cetz: cetz,
     finite: finite,
+    util: util,
     automaton: finite.automaton
   )
+)
+
+#let show-module(name, scope: (:), outlined: false) = tidy-module(
+  read(name + ".typ"),
+  name: name,
+  show-outline: outlined,
+  include-examples-scope: true,
+  extract-headings: 3,
+  tidy: tidy
 )
 
 = Usage
@@ -55,7 +60,7 @@
 For Typst 0.6.0 and later, the package can be imported from the _preview_ repository:
 
 #codesnippet[```typ
-#import "@preview/finite:0.1.0": automaton
+#import "@preview/finite:0.3.0": automaton
 ```]
 
 Alternatively, the package can be downloaded and saved into the system dependent local package repository.
@@ -63,15 +68,15 @@ Alternatively, the package can be downloaded and saved into the system dependent
 Either download the current release from GitHub#footnote[#link("https://github.com/jneug/typst-finite")] and unpack the archive into your system dependent local repository folder#footnote[#link("https://github.com/typst/packages#local-packages")] or clone it directly:
 
 #codesnippet[```shell-unix-generic
-git clone https://github.com/jneug/typst-finite.git finite/0.1.0
+git clone https://github.com/jneug/typst-finite.git finite/0.3.0
 ```]
 
-In either case, make sure the files are placed in a subfolder with the correct version number: `finite/0.1.0`
+In either case, make sure the files are placed in a subfolder with the correct version number: `finite/0.3.0`
 
 After installing the package, just import it inside your `typ` file:
 
 #codesnippet[```typ
-#import "@local/finite:0.1.0": automaton
+#import "@local/finite:0.3.0": automaton
 ```]
 
 == Dependencies
@@ -175,12 +180,7 @@ A specification can have these elements:
 The utility function #cmd(module:"util")[to-spec] can be used to create a full spec from a parital dictionary by filling in the missing values with the defaults.
 
 == Command reference
-#tidy-module(
-  read("cmd.typ"),
-  name: "cmd",
-  show-outline: false,
-  scope: module-scope
-)
+#show-module("cmd")
 
 == Styling the output
 
@@ -249,12 +249,7 @@ The above commands use custom CETZ elements to draw states and transitions. For 
 ```]
 
 === Element functions
-#tidy-module(
-  read("draw.typ"),
-  name: "draw",
-  show-outline: false,
-  scope: module-scope
-)
+#show-module("draw")
 
 === Anchors
 
@@ -295,11 +290,7 @@ Layouts can be used to move states to new positions within a call to #cetz-cmd-[
 FINITE ships with a bunch of layouts, to accomodate different scenarios.
 
 === Available layouts <available-layouts>
-#tidy-module(
-  read("layout.typ"),
-  name: "layout",
-  scope: module-scope
-)
+#show-module("layout")
 
 === Using layouts
 
@@ -418,11 +409,7 @@ To create a layout, FINITE provides a base element that can be extended. A basic
 ```]
 
 == Utility functions
-#tidy-module(
-  read("util.typ"),
-  name: "util",
-  scope: module-scope
-)
+#show-module("util", outlined: true)
 
 == Doing other stuff with FINITE
 

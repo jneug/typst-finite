@@ -21,7 +21,7 @@
 ///   - #value(true),
 ///   - an #dtype("alignment") to specify an anchor for the inital marking,
 ///   - a #dtype("string") to specify text for the initial marking,
-///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking.
+///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking. Additionally, the keys `stroke` and `scale` can be used to style the marking.
 /// - final (boolean): Whether this is a final state.
 /// - anchor (string): Anchor to use for drawing.
 /// - ..style (any): Styling options.
