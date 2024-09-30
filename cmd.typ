@@ -74,7 +74,7 @@
   final: auto,
   labels: (:),
   style: (:),
-  state-format: (label) => {
+  state-format: label => {
     let m = label.match(regex(`^(\D+)(\d+)$`.text))
     if m != none {
       [#m.captures.at(0)#sub(m.captures.at(1))]
@@ -82,69 +82,77 @@
       label
     }
   },
-  input-format: (inputs) => inputs.map(str).join(","),
+  input-format: inputs => inputs.map(str).join(","),
   layout: layout.linear,
-  ..canvas-styles
+  ..canvas-styles,
 ) = {
-  spec = to-spec(spec, initial:initial, final:final)
+  spec = to-spec(spec, initial: initial, final: final)
 
   // use a dict with coordinates as custom layout
   if is.dict(layout) {
     layout = custom.with(positions: (..) => layout)
   }
 
-  cetz.canvas(..canvas-styles, {
-    import cetz.draw: set-style
-    import draw: state, transition
+  cetz.canvas(
+    ..canvas-styles,
+    {
+      import cetz.draw: set-style
+      import draw: state, transition
 
-    set-style(..style)
+      set-style(..style)
 
-    layout((0,0), {
-      for name in spec.states {
-        let label = labels.at(name, default:state-format(name))
-        state((),
-          name,
-          label: label,
-          initial: (name == spec.initial),
-          final: (name in spec.final),
-          ..style.at(name, default:(:))
-        )
-      }
-    })
-
-    // Transitions don't need to be layed out
-    for (from, transitions) in spec.transitions {
-      if is.dict(transitions) {
-        for (to, inputs) in transitions {
-          let name = from + "-" + to
-
-          // preapre inputs (may be a string or int)
-          if inputs == none {
-            inputs = ()
-          } else if not is.arr(inputs) {
-            inputs = str(inputs).split(",")
+      layout(
+        (0, 0),
+        {
+          for name in spec.states {
+            let label = labels.at(name, default: state-format(name))
+            state(
+              (),
+              name,
+              label: label,
+              initial: (name == spec.initial),
+              final: (name in spec.final),
+              ..style.at(name, default: (:)),
+            )
           }
+        },
+      )
 
-          // prepare label
-          let label = labels.at(
-            name, default: input-format(inputs)
-          )
-          if is.dict(label) and "text" not in label {
-            label.text = input-format(inputs)
+      // Transitions don't need to be layed out
+      for (from, transitions) in spec.transitions {
+        if is.dict(transitions) {
+          for (to, inputs) in transitions {
+            let name = from + "-" + to
+
+            // preapre inputs (may be a string or int)
+            if inputs == none {
+              inputs = ()
+            } else if not is.arr(inputs) {
+              inputs = str(inputs).split(",")
+            }
+
+            // prepare label
+            let label = labels.at(
+              name,
+              default: input-format(inputs),
+            )
+            if is.dict(label) and "text" not in label {
+              label.text = input-format(inputs)
+            }
+
+            // create transition
+            transition(
+              from,
+              to,
+              inputs: inputs,
+              label: label,
+              ..style.at(name, default: (:)),
+            )
           }
-
-          // create transition
-          transition(
-            from,
-            to,
-            inputs: inputs,
-            label: label,
-            ..style.at(name, default:(:))
-          )
         }
       }
-    }
-  })
+    },
+  )
 }
 
 /// Displays a transition table for an automaton.
@@ -194,10 +202,10 @@
   initial: auto,
   final: auto,
   format: (col, v) => raw(str(v)),
-  format-list: (states) => states.join(", "),
-  ..table-style
+  format-list: states => states.join(", "),
+  ..table-style,
 ) = {
-  spec = to-spec(spec, initial:initial, final:final)
+  spec = to-spec(spec, initial: initial, final: final)
 
   let table-cnt = ()
   for (state, transitions) in spec.transitions {
@@ -212,7 +220,7 @@
           label = def.as-arr(label).map(str)
 
           if char in label {
-            to.push(format(i+1, name))
+            to.push(format(i + 1, name))
           }
         }
         table-cnt.push(format-list(to))
@@ -222,7 +230,9 @@
 
   table(
     columns: 1 + spec.inputs.len(),
-    fill: (c,r) => if r == 0 or c == 0 { luma(240) },
+    fill: (c, r) => if r == 0 or c == 0 {
+      luma(240)
+    },
     align: center + horizon,
     ..table-style,
     [], ..spec.inputs.map(raw),
@@ -248,15 +258,15 @@
   spec,
   initial: auto,
   final: auto,
-  state-format: (states) => "{" + states.sorted().join(",") + "}"
+  state-format: states => "{" + states.sorted().join(",") + "}",
 ) = {
-  spec = to-spec(spec, initial:initial, final:final)
+  spec = to-spec(spec, initial: initial, final: final)
 
   let table = transpose-table(spec.transitions)
 
   let (new-initial, new-final) = (
     state-format((spec.initial,)),
-    ()
+    (),
   )
 
   let powerset = (:)
@@ -268,7 +278,7 @@
     if key not in powerset {
       powerset.insert(key, (:))
 
-      if cur.any((s) => s in spec.final) {
+      if cur.any(s => s in spec.final) {
         new-final.push(key)
       }
 
@@ -285,6 +295,8 @@
         queue.push(trans)
       }
     }
+
+    i += 1
   }
 
   for (s, t) in powerset {
@@ -297,7 +309,7 @@
     transpose-table(powerset),
     initial: new-initial,
     final: new-final,
-    inputs: spec.inputs
+    inputs: spec.inputs,
   )
 }
 
@@ -339,10 +351,16 @@
   }
 
   if trap-added {
-    table.insert(trap-name, spec.inputs.fold((:), (d,i) => {
-      d.insert(i, (trap-name,))
-      return d
-    }))
+    table.insert(
+      trap-name,
+      spec.inputs.fold(
+        (:),
+        (d, i) => {
+          d.insert(i, (trap-name,))
+          return d
+        },
+      ),
+    )
   }
 
   spec.at("transitions") = transpose-table(table)
@@ -373,16 +391,16 @@
 #let accepts(
   spec,
   word,
-  format: (states) => states.map(((s, i)) => if i != none [
-    #s #box[#sym.arrow.r#place(top+center, dy:-88%)[#text(.88em,raw(i))]]
-  ] else [#s]).join()
+  format: states => states.map(((s, i)) => if i != none [
+    #s #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, raw(i))]]
+  ] else [#s]).join(),
 ) = {
   spec = to-spec(spec)
 
   let (transitions, initial, final) = (
-    spec.at("transitions", default:(:)),
-    spec.at("initial", default:none),
-    spec.at("final", default:()),
+    spec.at("transitions", default: (:)),
+    spec.at("initial", default: none),
+    spec.at("final", default: ()),
   )
   transitions = transpose-table(transitions)
 
@@ -398,7 +416,7 @@
           for next-state in transitions.at(state).at(symbol) {
             let states = traverse(word.slice(1), next-state)
             if states != false {
-              return ((state,symbol),) + states
+              return ((state, symbol),) + states
             }
           }
         }
@@ -407,7 +425,7 @@
     }
     // Word accepted?
     if state in final {
-      return ((state,none),)
+      return ((state, none),)
     } else {
       return false
     }
