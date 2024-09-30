@@ -316,7 +316,7 @@
   }
   if "final" not in spec {
     if is.a(final) {
-      final = spec.states.last()
+      final = (spec.states.last(),)
     } else if is.n(final) {
       final = ()
     }
