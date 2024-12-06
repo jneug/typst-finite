@@ -4,7 +4,7 @@
 
 ## Usage
 
-For Typst 0.6.0 or later, import the package from the typst preview repository:
+For Typst 0.6.0 or later, import the package from the Typst preview repository:
 
 ```js
 #import "@preview/finite:0.4.0": automaton
@@ -36,20 +36,24 @@ To compile the manual, Mantys needs to be available as a local package. Refer to
 
 ## Changelog
 
+### Version 0.4.0
+
+:warning: Version 0.4.0 is a major rewrite of finite to make it compatible with Typst 0.12 and CeTZ 0.3.0. This includes some minor breaking changes, mostly in how layouts work, but overall functionality should be the same. 
+
 ### Version 0.3.2
 
-- Fixed an issue with final states not beeing recognized properly (#5)
+- Fixed an issue with final states not being recognized properly (#5)
 
 ### Version 0.3.1
 
-- Added styling options for intial states:
+- Added styling options for initial states:
 	- `stroke` sets a stroke for the marking.
 	- `scale` scales the marking by a factor.
 - Updated manual.
 
 ### Version 0.3.0
 
-- Bumped tools4typst to v0.3.2.
+- Bumped `tools4typst` to v0.3.2.
 - Introducing automaton specs as a data structure.
 - Changes to `automaton` command:
 	- Changed `label-format` argument to `state-format` and `input-format`.
