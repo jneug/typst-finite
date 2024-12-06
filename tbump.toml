@@ -2,7 +2,7 @@
 github_url = "https://github.com/jneug/typst-finite/"
 
 [version]
-current = "0.3.1"
+current = "0.4.0"
 
 # Example of a semver regexp.
 # Make sure this matches current_version before
