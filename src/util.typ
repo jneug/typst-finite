@@ -1,8 +1,8 @@
+// Package imports
 #import "@preview/t4t:0.3.2": get, def, is, assert, math
+#import "@preview/cetz:0.3.0"
 
-#import "@preview/cetz:0.1.1": vector, matrix, draw
-#import draw: util, styles, cmd, coordinate
-#import util.bezier: cubic-point, cubic-derivative, cubic-through-3points
+#import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
 
 // =================================
 //  Defaults
@@ -10,12 +10,25 @@
 
 #let default-style = (
   state: (
-    fill: auto,
+    fill: white,
     stroke: auto,
     radius: .6,
+    extrude: .9,
     label: (
       text: auto,
-      size: auto,
+      size: 1em,
+      fill: black,
+      padding: auto,
+    ),
+    initial: (
+      anchor: left,
+      label: (
+        text: "Start",
+        size: .88em,
+        dist: .1,
+      ),
+      stroke: auto,
+      scale: .8,
     ),
   ),
   transition: (
@@ -36,25 +49,16 @@
 //  Vectors
 // =================================
 
-/// Set the length of a vector.
-#let vector-set-len(v, len) = if vector.len(v) == 0 {
+/// Set the length of a cetz.vector.
+#let vector-set-len(v, len) = if cetz.vector.len(v) == 0 {
   return v
 } else {
-  return vector.scale(vector.norm(v), len)
+  return cetz.vector.scale(cetz.vector.norm(v), len)
 }
 
-/// Compute a normal for a 2d vector. The normal will be pointing to the right
-/// of the original vector.
-#let vector-normal(v) = vector.norm((-v.at(1), v.at(0), 0))
-
-/// Returns a vector for an alignment.
-#let align-to-vec(a) = {
-  let v = (
-    ("none": 0, "left": -1, "right": 1).at(repr(get.x-align(a, default: none))),
-    ("none": 0, "top": 1, "bottom": -1).at(repr(get.y-align(a, default: none))),
-  )
-  return vector.norm(v)
-}
+/// Compute a normal for a 2d cetz.vector. The normal will be pointing to the right
+/// of the original cetz.vector.
+#let vector-normal(v) = cetz.vector.norm((-v.at(1), v.at(0), 0))
 
 /// Rotates a vector by #arg[angle] degree around the origin.
 #let vector-rotate(vec, angle) = {
@@ -65,6 +69,16 @@
   )
 }
 
+/// Returns a vector for an alignment.
+#let align-to-vec(a) = {
+  let v = (
+    ("none": 0, "center": 0, "left": -1, "right": 1).at(repr(a.x)),
+    ("none": 0, "horizon": 0, "top": 1, "bottom": -1).at(repr(a.y)),
+  )
+
+  return cetz.vector.norm(v)
+}
+
 
 // =================================
 //  Bezier
@@ -73,7 +87,7 @@
 /// Compute a normal vector for a point on a cubic bezier curve.
 #let cubic-normal(a, b, c, d, t) = {
   let qd = cubic-derivative(a, b, c, d, t)
-  if vector.len(qd) == 0 {
+  if cetz.vector.len(qd) == 0 {
     return (0, 1, 0)
   } else {
     return vector-normal(qd)
@@ -93,13 +107,13 @@
   if curve == 0 {
     return (a, b, b, a)
   }
-  let ab = vector.sub(b, a)
-  let X = vector.add(
-    vector.add(
+  let ab = cetz.vector.sub(b, a)
+  let X = cetz.vector.add(
+    cetz.vector.add(
       a,
-      vector.scale(ab, .5),
+      cetz.vector.scale(ab, .5),
     ),
-    vector.scale(
+    cetz.vector.scale(
       vector-normal(ab),
       curve,
     ),
@@ -124,9 +138,9 @@
     dist *= -1
   }
 
-  return vector.add(
+  return cetz.vector.add(
     pt,
-    vector.scale(n, dist),
+    cetz.vector.scale(n, dist),
   )
 }
 
@@ -140,11 +154,11 @@
 #let loop-pts(start, start-radius, anchor: top, curve: 1) = {
   anchor = vector-set-len(align-to-vec(anchor), start-radius)
 
-  let end = vector.add(
+  let end = cetz.vector.add(
     start,
     vector-rotate(anchor, -22.5deg),
   )
-  let start = vector.add(
+  let start = cetz.vector.add(
     start,
     vector-rotate(anchor, 22.5deg),
   )
@@ -161,9 +175,9 @@
     (c1, c2) = (c2, c1)
   }
 
-  let d = vector.scale(vector.sub(c2, c1), curve * 4)
-  c1 = vector.sub(c1, d)
-  c2 = vector.add(c2, d)
+  let d = cetz.vector.scale(cetz.vector.sub(c2, c1), curve * 4)
+  c1 = cetz.vector.sub(c1, d)
+  c2 = cetz.vector.add(c2, d)
 
   return (start, end, c1, c2)
 }
@@ -183,20 +197,20 @@
   } else {
     let (start, end, ctrl1, ctrl2) = cubic-pts(start, end, curve: curve)
 
-    start = vector.add(
+    start = cetz.vector.add(
       start,
       vector-set-len(
-        vector.sub(
+        cetz.vector.sub(
           ctrl1,
           start,
         ),
         start-radius,
       ),
     )
-    end = vector.add(
+    end = cetz.vector.add(
       end,
       vector-set-len(
-        vector.sub(
+        cetz.vector.sub(
           end,
           ctrl2,
         ),
@@ -224,12 +238,12 @@
   let m = (width: 2 * width, height: 2 * height)
   while (m.height > height or m.width > height) and s > min-size {
     s = s * .88
-    m = measure(
+    m = cetz.util.measure(
+      ctx,
       {
         set text(s)
         content
       },
-      ctx.typst-style,
     )
   }
   s = calc.max(min-size, s)
@@ -238,37 +252,6 @@
     content
   }
 }
-
-/// Prepares the CeTZ context for use with finite
-#let prepare-ctx(ctx, force: false) = {
-  if force or "finite" not in ctx {
-    // supposed to store state information at some point
-    ctx.insert("finite", (states: ()))
-
-    // add default state styles to context
-    if "state" not in ctx.style {
-      ctx.style.insert("state", default-style.state)
-    } else {
-      if "label" in ctx.style.state and not is.dict(ctx.style.state.label) {
-        ctx.style.state.label = (text: ctx.style.state.label)
-      }
-      ctx.style.state = styles.resolve(default-style.state, ctx.style.state)
-    }
-
-    // add default transition styles to context
-    if "transition" not in ctx.style {
-      ctx.style.insert("transition", default-style.transition)
-    } else {
-      if "label" in ctx.style.transition and not is.dict(ctx.style.transition.label) {
-        ctx.style.transition.label = (text: ctx.style.transition.label)
-      }
-      ctx.style.transition = styles.resolve(default-style.transition, ctx.style.transition)
-    }
-  }
-
-  return ctx
-}
-
 
 // Changes a transition table from the format (`state`: `inputs`) to (`input`: `states`) or vice versa.
 #let transpose-table(table) = {
@@ -352,62 +335,135 @@
 }
 
 
-
-// Unused
-
-#let calc-bounds(positions) = {
-  let bounds = (
-    x: positions.first().at(0),
-    y: positions.first().at(1),
-    width: positions.first().at(0),
-    height: positions.first().at(1),
-  )
-  for (x, y) in positions {
-    bounds.x = calc.min(bounds.x, x)
-    bounds.y = calc.min(bounds.y, y)
-    bounds.width = calc.max(bounds.width, x)
-    bounds.height = calc.max(bounds.height, y)
+/// Return anchor name for an #dtype(alignment).
+#let align-to-anchor(align) = {
+  let anchor = ()
+  if align.y == top {
+    anchor.push("north")
+  } else if align.y == bottom {
+    anchor.push("south")
   }
-  bounds.width = bounds.width - bounds.x
-  bounds.height = bounds.height - bounds.y
-  return bounds
+  if align.x == left {
+    anchor.push("west")
+  } else if align.x == right {
+    anchor.push("east")
+  }
+  if anchor == () {
+    return "center"
+  } else {
+    return anchor.join("-")
+  }
 }
 
-#let calc-shift(anchor, bounds: none) = {
-  let shift = (x: -.5, y: -.5)
-  if anchor.ends-with("right") {
-    shift.x -= .5
-  } else if anchor.ends-with("left") {
-    shift.x += .5
+#let to-anchor(align) = {
+  if type(align) == alignment {
+    return align-to-anchor(align)
+  } else {
+    align
   }
-  if anchor.starts-with("top") {
-    shift.y -= .5
-  } else if anchor.starts-with("bottom") {
-    shift.y += .5
-  }
-  if bounds != none {
-    shift.x *= bounds.width
-    shift.y *= bounds.height
-  }
-  return shift
 }
 
-#let shift-by-anchor(positions, anchor) = {
-  let bounds = calc-bounds(positions.values())
-  let shift = calc-shift(anchor, bounds: bounds)
-
-  for (name, pos) in positions {
-    let (x, y) = pos
-    positions.at(name) = (x + shift.x, y + shift.y)
-  }
-
-  return positions
-}
-
-#let resolve-radius(state, style) = if state in style and "radius" in style.at(state) {
-  return style.at(state).radius
-} else if "state" in style and "radius" in style.state {
-  return style.state.radius
+#let label-angle(vec, a) = if a in (top, top + right, right, bottom + right) {
+  cetz.vector.angle2((0, 0), vec)
 } else {
-  return default-style.state.radius
+  cetz.vector.angle2(vec, (0, 0))
+}
+
+#let abs-angle-between(vec1, vec2, lower, upper) = {
+  let ang = calc.abs(cetz.vector.angle2(vec1, vec2))
+  return ang >= lower and ang <= upper
+}
+
+
+#let is-state(element) = {
+  return "finite" in element and element.finite.state
+}
+
+#let is-transition(element) = {
+  return "finite" in element and element.finite.transition
+}
+
+#let resolve-one(ctx, element) = {
+  element = (element)(ctx)
+  ctx = element.ctx
+
+  if "name" in element and element.name != none {
+    if "nodes" not in ctx {
+      ctx.insert("nodes", (:))
+    }
+    ctx.nodes.insert(element.name, element)
+  }
+
+  return (ctx, element)
+}
+
+#let resolve-many(ctx, body) = {
+  let elements = ()
+  let (_ctx, element) = (ctx, none)
+  for element in body {
+    (_ctx, element) = resolve-one(_ctx, element)
+    elements.push(element)
+  }
+  return (_ctx, elements)
+}
+
+#let resolve-zipped(ctx, body) = {
+  let (_ctx, elements) = resolve-many(ctx, body)
+  return (_ctx, body.zip(elements))
+}
+
+#let resolve-states(ctx, body) = {
+  let (_, elements) = resolve-many(ctx, body)
+  return elements.filter(is-state)
+}
+
+#let get-radii(elements) = {
+  return elements.filter(is-state).fold(
+    (:),
+    (radii, element) => {
+      radii.insert(element.name, element.finite.radius)
+      return radii
+    },
+  )
+}
+
+// Resolve radii for states by applying styles from other elements.
+#let resolve-radii(ctx, body) = {
+  let (_, elements) = resolve-many(ctx, body)
+  return get-radii(elements)
+}
+
+#let state-wrapper(group) = {
+  return (
+    ctx => {
+      let g = (group.first())(ctx)
+      g.insert(
+        "finite",
+        (
+          state: true,
+          transition: false,
+          radius: (g.anchors)("state.east").at(0) - (g.anchors)("state.center").at(0),
+        ),
+      )
+      return g
+    },
+  )
+}
+
+#let transition-wrapper(from, to, group) = {
+  return (
+    ctx => {
+      let g = (group.first())(ctx)
+      g.insert(
+        "finite",
+        (
+          state: false,
+          transition: true,
+          from: from,
+          to: to,
+        ),
+      )
+      return g
+    },
+  )
 }

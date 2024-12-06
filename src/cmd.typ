@@ -1,10 +1,7 @@
-#import "@preview/t4t:0.3.2": is, assert, def
-#import "@preview/cetz:0.1.1"
-
 #import "./draw.typ"
 #import "./layout.typ"
-#import "./layout.typ": custom
-#import "./util.typ": transpose-table, get-inputs, to-spec
+#let _layout = layout
+#import "./util.typ" as util: to-spec, cetz
 
 
 /// Draw an automaton from a specification.
@@ -25,11 +22,11 @@
 /// ```]
 ///
 /// #arg[inital] and #arg[final] can be used to customize the initial and final states.
-/// #ibox[The #arg[inital] and #arg[final] will be removed in future
+/// #info-alert[The #arg[inital] and #arg[final] will be removed in future
 ///   versions in favor of automaton specs.
 /// ]
 ///
-/// - spec (dictionary): Automaton specification.
+/// - spec (spec): Automaton specification.
 /// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[spec] is used.
 /// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[spec] is used.
 /// - labels (dictionary): A dictionary with labels for states and transitions.
@@ -89,9 +86,11 @@
   spec = to-spec(spec, initial: initial, final: final)
 
   // use a dict with coordinates as custom layout
-  if is.dict(layout) {
-    layout = custom.with(positions: (..) => layout)
+  if util.is.dict(layout) {
+    layout = _layout.custom.with(positions: layout)
   }
+
+  let layout-name(p) = ("aut", p).filter(util.is.not-none).join(".")
 
   cetz.canvas(
     ..canvas-styles,
@@ -103,13 +102,13 @@
 
       layout(
         (0, 0),
+        name: layout-name(none),
         {
           for name in spec.states {
-            let label = labels.at(name, default: state-format(name))
             state(
               (),
               name,
-              label: label,
+              label: labels.at(name, default: state-format(name)),
               initial: (name == spec.initial),
               final: (name in spec.final),
               ..style.at(name, default: (:)),
@@ -118,16 +117,16 @@
         },
       )
 
-      // Transitions don't need to be layed out
+      // Transitions don't need to be positioned
       for (from, transitions) in spec.transitions {
-        if is.dict(transitions) {
+        if util.is.dict(transitions) {
           for (to, inputs) in transitions {
             let name = from + "-" + to
 
-            // preapre inputs (may be a string or int)
+            // prepare inputs (may be a string or int)
             if inputs == none {
               inputs = ()
-            } else if not is.arr(inputs) {
+            } else if not util.is.arr(inputs) {
               inputs = str(inputs).split(",")
             }
 
@@ -136,14 +135,14 @@
               name,
               default: input-format(inputs),
             )
-            if is.dict(label) and "text" not in label {
+            if util.is.dict(label) and "text" not in label {
               label.text = input-format(inputs)
             }
 
             // create transition
             transition(
-              from,
-              to,
+              layout-name(from),
+              layout-name(to),
               inputs: inputs,
               label: label,
               ..style.at(name, default: (:)),
@@ -170,11 +169,11 @@
 /// ))
 /// ```)
 ///
-/// #ibox[The #arg[inital] and #arg[final] will be removed in future
+/// #info-alert[The #arg[inital] and #arg[final] will be removed in future
 ///   versions in favor of automaton specs.
 /// ]
 ///
-/// - spec (dictionary): Automaton specification.
+/// - spec (spec): Automaton specification.
 /// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
 /// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[states] is used.
 /// - format (function): A function to format the value in a table column. The function takes a column index and
@@ -195,7 +194,7 @@
 ///     q2: (q0: 1, q2: 0),
 ///   ), format-list: (states) => "[" + states.join(" | ") + "]")
 ///   ```]
-/// - ..table-style (any): Arguments for #doc("layout/table").
+/// - ..table-style (any): Arguments for #builtin("table").
 /// -> content
 #let transition-table(
   spec,
@@ -210,14 +209,14 @@
   let table-cnt = ()
   for (state, transitions) in spec.transitions {
     table-cnt.push(format(0, state))
-    if is.dict(transitions) {
+    if util.is.dict(transitions) {
       for (i, char) in spec.inputs.enumerate() {
         let to = ()
         for (name, label) in transitions {
-          if is.str(label) {
+          if util.is.str(label) {
             label = label.split(",")
           }
-          label = def.as-arr(label).map(str)
+          label = util.def.as-arr(label).map(str)
 
           if char in label {
             to.push(format(i + 1, name))
@@ -240,6 +239,7 @@
   )
 }
 
+
 /// Creates a deterministic finite automaton from a nondeterministic one by using powerset construction.
 ///
 /// See #link("https://en.wikipedia.org/wiki/Powerset_construction")[the Wikipedia article on powerset construction] for further
@@ -249,7 +249,7 @@
 /// finite automaton. See above for a description of the
 /// specification dictionaries.
 ///
-/// - spec (dictionary): Automaton specification.
+/// - spec (spec): Automaton specification.
 /// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
 /// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[states] is used.
 /// - state-format (function): A function to generate the new state names from a list of states.
@@ -262,7 +262,7 @@
 ) = {
   spec = to-spec(spec, initial: initial, final: final)
 
-  let table = transpose-table(spec.transitions)
+  let table = util.transpose-table(spec.transitions)
 
   let (new-initial, new-final) = (
     state-format((spec.initial,)),
@@ -306,7 +306,7 @@
   }
 
   return to-spec(
-    transpose-table(powerset),
+    util.transpose-table(powerset),
     initial: new-initial,
     final: new-final,
     inputs: spec.inputs,
@@ -332,12 +332,12 @@
 ///
 /// // >>> finite.add-trap((transitions: (q0: (q1: ())), inputs: (0,1))) == finite.to-spec((transitions: (q0: (TRAP:("0","1")), TRAP: (TRAP: ("0","1"))), inputs: ("0","1")))
 ///
-/// - spec (dictionary): Automaton specification.
+/// - spec (spec): Automaton specification.
 /// - trap-name (string): Name for the new trap-state.
 #let add-trap(spec, trap-name: "TRAP") = {
   spec = to-spec(spec)
 
-  let table = transpose-table(spec.transitions)
+  let table = util.transpose-table(spec.transitions)
 
   let trap-added = false
   for (s, values) in table {
@@ -363,7 +363,7 @@
     )
   }
 
-  spec.at("transitions") = transpose-table(table)
+  spec.at("transitions") = util.transpose-table(table)
   return spec
 }
 
@@ -385,7 +385,7 @@
 /// #finite.accepts(aut, "0101")
 /// ```]
 ///
-/// - spec (dictionary): Automaton specification.
+/// - spec (spec): Automaton specification.
 /// - word (string): A word to test.
 /// - format (function): A function to format the result.
 #let accepts(
@@ -402,11 +402,11 @@
     spec.at("initial", default: none),
     spec.at("final", default: ()),
   )
-  transitions = transpose-table(transitions)
+  transitions = util.transpose-table(transitions)
 
-  assert.not-empty(transitions)
-  assert.not-empty(initial)
-  assert.not-empty(final)
+  util.assert.not-empty(transitions)
+  util.assert.not-empty(initial)
+  util.assert.not-empty(final)
 
   let traverse(word, state) = {
     if word.len() > 0 {
