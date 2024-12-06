@@ -32,4 +32,4 @@ search = "finite:{current_version}"
 
 [[before_commit]]
 name = "compile manual"
-cmd = "typst c manual.typ"
+cmd = "typst c --root . docs/manual.typ"
