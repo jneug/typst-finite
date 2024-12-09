@@ -2,7 +2,7 @@
 
 [package]
 name = "finite"
-version = "0.4.0"
+version = "0.4.1"
 entrypoint = "src/finite.typ"
 authors = ["Jonas Neugebauer"]
 license = "MIT"
