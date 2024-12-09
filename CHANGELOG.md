@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.4.1
+
+- Fixes error in `#powerset` function (#8).
+
 ### Version 0.4.0
 
 :warning: Version 0.4.0 is a major rewrite of finite to make it compatible with Typst 0.12 and CeTZ 0.3.0. This includes some minor breaking changes, mostly in how layouts work, but overall functionality should be the same. 
