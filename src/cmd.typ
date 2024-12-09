@@ -295,8 +295,6 @@
         queue.push(trans)
       }
     }
-
-    i += 1
   }
 
   for (s, t) in powerset {
