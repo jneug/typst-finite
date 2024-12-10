@@ -31,13 +31,14 @@
   label: auto,
   initial: false,
   final: false,
-  anchor: "center",
+  anchor: none,
   ..style,
 ) = {
   // No extra positional arguments from the style sink
   util.assert.no-pos(style)
 
   // Create element function
+  // TODO: (ngb) remove wrapper
   util.state-wrapper(
     cetz.draw.group(
       name: name,
@@ -79,19 +80,12 @@
           root: "state",
         )
 
+        // resolve coordinates
+        let (_, pos) = cetz.coordinate.resolve(ctx, position)
 
-        cetz.draw.set-ctx(_ctx => {
-          // Add new state to CetZ context
-          if "finite" not in _ctx {
-            _ctx.insert("finite", (states: (:)))
-          }
-          _ctx.finite.states.insert(name, (name: name, radius: style.radius))
-          _ctx
-        })
-
-        cetz.draw.circle(position, name: "state", ..style)
+        cetz.draw.circle(pos, name: "state", ..style)
         if final {
-          cetz.draw.circle(position, stroke: style.stroke, radius: style.radius * style.extrude)
+          cetz.draw.circle(pos, stroke: style.stroke, radius: style.radius * style.extrude)
         }
         if initial != false {
           let color = if style.initial.stroke == auto {
@@ -119,6 +113,7 @@
           )
           if style.initial.label != none {
             cetz.draw.content(
+              name: "initial-label",
               (
                 rel: util.vector-set-len(
                   util.vector-rotate(
@@ -160,9 +155,15 @@
           )
         }
         cetz.draw.copy-anchors("state")
+        cetz.draw.anchor("default", "state.center")
       },
     ),
   )
+  // Update prev coordinate
+  cetz.draw.set-ctx(ctx => {
+    let (ctx, _) = cetz.coordinate.resolve(ctx, position)
+    ctx
+  })
 }
 
 /// Draw a transition between two states.
@@ -203,7 +204,7 @@
   util.assert.all-of-type("string", from, to)
   let name = from.split(".").last() + "-" + to.split(".").last()
 
-  return util.transition-wrapper(
+  util.transition-wrapper(
     from,
     to,
     cetz.draw.group(
@@ -325,6 +326,11 @@
       },
     ),
   )
+  // Update prev coordinate
+  cetz.draw.set-ctx(ctx => {
+    let (ctx, _) = cetz.coordinate.resolve(ctx, to)
+    ctx
+  })
 }
 
 
