@@ -1,6 +1,7 @@
 // Package imports
 #import "@preview/t4t:0.4.0": *
 #import "@preview/cetz:0.3.1"
+#import "@preview/valkyrie:0.2.1" as t
 
 #import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
 
@@ -13,11 +14,11 @@
     fill: white,
     stroke: auto,
     radius: .6,
-    extrude: .9,
+    extrude: .88,
     label: (
       text: auto,
       size: 1em,
-      fill: black,
+      fill: none,
       padding: auto,
     ),
     initial: (
@@ -32,20 +33,46 @@
     ),
   ),
   transition: (
-    curve: .75,
+    curve: 1,
     stroke: auto,
     label: (
       text: "",
       size: 1em,
-      // TODO: (ngb) rename to fill
-      color: auto,
+      fill: none,
       pos: .5,
-      // TODO: (ngb) make default 1.0
       dist: .33,
       angle: auto,
     ),
   ),
 )
+
+// =================================
+//  Helpers
+// =================================
+
+/// Calls #arg[value] with #sarg[args], if it is a #dtype("function") and returns the result or #arg[value] otherwise.
+#let call-or-get(value, ..args) = {
+  if is-func(value) {
+    return value(..args)
+  } else {
+    return value
+  }
+}
+
+#let assert-dict = assert.new(
+  is-dict,
+  message: v => "dictionary expected. got " + repr(v),
+)
+#let assert-spec = assert.new(
+  value => is-dict(value) and "finite-spec" in value,
+  message: v => "automaton specification expected. got " + repr(v),
+)
+
+#let assert-full-spec = assert.new(
+  value => is-dict(value) and ("finite-spec", "type", "transitions", "states", "initial", "final").all(k => k in value),
+  message: v => "full automaton specification expected. got " + repr(v),
+)
+
 
 // =================================
 //  Vectors
@@ -278,10 +305,10 @@
   for (key, values) in table {
     let new-values = (:)
 
-    if is-noneot-none(values) {
+    if not-none(values) {
       for (kk, vv) in values {
         for i in def.as-arr(vv) {
-          if is-noneot-none(i) {
+          if not-none(i) {
             i = str(i)
             if i not in new-values {
               new-values.insert(i, (kk,))
@@ -320,6 +347,7 @@
 /// Creates a full specification for a finite automaton.
 #let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
   // TODO: (ngb) add asserts to react to malicious specs
+  // TODO: (ngb) check for duplicate names
   if "transitions" not in spec {
     spec = (transitions: spec)
   }
@@ -351,7 +379,7 @@
   } else {
     spec.inputs = spec.inputs.map(str).sorted()
   }
-  return spec
+  return spec + (finite-spec: true, type: "DEA")
 }
 
 
@@ -470,6 +498,29 @@
   )
 }
 
+#let get-radii(spec, style: (:)) = spec.states.fold(
+  (:),
+  (d, name) => {
+    let r = style.at(name, default: (:)).at("radius", default: none)
+    d.insert(
+      name,
+      style
+        .at(
+          name,
+          default: style.at(
+            "state",
+            default: (:),
+          )
+        )
+        .at(
+        "radius",
+        default: default-style.state.radius,
+      ),
+    )
+    d
+  },
+)
+
 #let transition-wrapper(from, to, group) = {
   return (
     ctx => {
@@ -487,3 +538,5 @@
     },
   )
 }
+
+#let dot = cetz.draw.circle.with(fill: red, stroke: none, radius: .1)

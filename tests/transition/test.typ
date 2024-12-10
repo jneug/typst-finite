@@ -27,6 +27,6 @@
   transition("q1", "q2", label: "A", stroke: blue)
   transition("q2", "q3", label: (text: "A"))
   transition("q3", "q0", label: (text: "A", size: 2em))
-  transition("q2", "q1", label: (text: "A", color: green, pos: .8), stroke: blue)
+  transition("q2", "q1", label: (text: "A", fill: green, pos: .8), stroke: blue)
   transition("q0", "q3", label: (text: "A", size: 2em, pos: 0.2, dist: -.33, angle: 0deg), stroke: blue)
 })

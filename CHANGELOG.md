@@ -6,6 +6,23 @@
 	- `flaci.load` loads an FLACI file as a `finite` automaton specification.
 	- `flaci.autoamton` displays an FLACI file as an `finite` automaton.
 
+
+### Version 0.5.0
+
+- :warning: New layout system:
+	- Layouts are no longer CeTZ groups and only are used as a parameter to `#automaton`.
+- :warning: Breaking style changes:
+	- Changed label color attribute from `color` to `fill` for consistency.
+	- The default for `state.label.fill` and `transition.label.fill` is now `none` and sets the color of the label to `stroke.paint`.
+	- The default value for `transition.curve` is now `1.0` for an easier understanding of the influence on the curvature.
+
+### Version 0.4.2
+
+- Fixed label rotation for transitions.
+- Bumped dependencies:
+	- CeTZ 0.3.0 :arrow upper right: 0.3.1
+	- t4t 0.3.1 :arrow upper right: 0.4.0
+
 ### Version 0.4.1
 
 - Fixes error in `#powerset` function (#8).
