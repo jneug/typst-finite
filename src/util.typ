@@ -1,6 +1,7 @@
 // Package imports
 #import "@preview/t4t:0.4.0": *
 #import "@preview/cetz:0.3.1"
+#import "@preview/valkyrie:0.2.1" as t
 
 #import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
 
@@ -329,6 +330,7 @@
 /// Creates a full specification for a finite automaton.
 #let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
   // TODO: (ngb) add asserts to react to malicious specs
+  // TODO: (ngb) check for duplicate names
   if "transitions" not in spec {
     spec = (transitions: spec)
   }
@@ -479,6 +481,29 @@
   )
 }
 
+#let get-radii(spec, style: (:)) = spec.states.fold(
+  (:),
+  (d, name) => {
+    let r = style.at(name, default: (:)).at("radius", default: none)
+    d.insert(
+      name,
+      style
+        .at(
+          name,
+          default: style.at(
+            "state",
+            default: (:),
+          )
+        )
+        .at(
+        "radius",
+        default: default-style.state.radius,
+      ),
+    )
+    d
+  },
+)
+
 #let transition-wrapper(from, to, group) = {
   return (
     ctx => {
@@ -496,3 +521,5 @@
     },
   )
 }
+
+#let dot = cetz.draw.circle.with(fill: red, stroke: none, radius: .1)

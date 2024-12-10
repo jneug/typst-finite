@@ -90,7 +90,7 @@
     layout = _layout.custom.with(positions: layout)
   }
 
-  let layout-name(p) = ("aut", p).filter(util.not-none).join(".")
+  let (coordinates, anchors) = layout(spec, style: style)
 
   cetz.canvas(
     ..canvas-styles,
@@ -100,24 +100,23 @@
 
       set-style(..style)
 
-      layout(
-        (0, 0),
-        name: layout-name(none),
-        {
-          for name in spec.states {
-            state(
-              (),
-              name,
-              label: labels.at(name, default: state-format(name)),
-              initial: (name == spec.initial),
-              final: (name in spec.final),
-              ..style.at(name, default: (:)),
-            )
-          }
-        },
-      )
+      // Create states
+      for name in spec.states {
+        state(
+          coordinates.at(name, default: ()),
+          name,
+          label: labels.at(name, default: state-format(name)),
+          initial: (name == spec.initial),
+          final: (name in spec.final),
+          anchor: anchors.at(name, default: none),
+          ..style.at(name, default: (:)),
+        )
 
-      // Transitions don't need to be positioned
+        util.dot(coordinates.at(name), fill: green)
+        util.dot(name + "." + anchors.at(name, default: "center"))
+      }
+
+      // Create transitions
       for (from, transitions) in spec.transitions {
         if util.is-dict(transitions) {
           for (to, inputs) in transitions {
@@ -141,8 +140,8 @@
 
             // create transition
             transition(
-              layout-name(from),
-              layout-name(to),
+              from,
+              to,
               inputs: inputs,
               label: label,
               ..style.at(name, default: (:)),
