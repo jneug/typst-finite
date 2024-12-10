@@ -17,7 +17,7 @@
     label: (
       text: auto,
       size: 1em,
-      fill: black,
+      fill: none,
       padding: auto,
     ),
     initial: (
@@ -32,15 +32,13 @@
     ),
   ),
   transition: (
-    curve: .75,
+    curve: 1,
     stroke: auto,
     label: (
       text: "",
       size: 1em,
-      // TODO: (ngb) rename to fill
-      color: auto,
+      fill: none,
       pos: .5,
-      // TODO: (ngb) make default 1.0
       dist: .33,
       angle: auto,
     ),

@@ -140,6 +140,13 @@
           }
         }
         if label not in (none, (:)) {
+          if style.label.fill in (auto, none) {
+            style.label.fill = stroke(style.stroke).paint
+          }
+          if style.label.fill == auto {
+            style.label.fill = black
+          }
+
           cetz.draw.content(
             "state.center",
             name: "label",
@@ -257,7 +264,7 @@
           end,
           start-rad,
           end-rad,
-          curve: style.curve,
+          curve: style.curve * .75,
           anchor: anchor,
         )
         cetz.draw.bezier(
@@ -278,11 +285,11 @@
         if not util.is-empty(style.label.text) {
           style.label.size = cetz.util.resolve-number(ctx, style.label.size) * ctx.length
 
-          if style.label.color == auto {
-            style.label.color = stroke(style.stroke).paint
+          if style.label.fill in (auto, none) {
+            style.label.fill = stroke(style.stroke).paint
           }
-          if style.label.color == auto {
-            style.label.color = black
+          if style.label.fill == auto {
+            style.label.fill = black
           }
 
           let label-pt = util.label-pt(start, end, ctrl1, ctrl2, style, loop: start == end)
@@ -303,9 +310,13 @@
               a
             },
             {
+              let label-style = (size: style.label.size)
+              if style.label.fill != none {
+                label-style.insert("fill", style.label.fill)
+              }
               set text(
                 size: style.label.size,
-                fill: style.label.color,
+                fill: style.label.fill,
               )
               style.label.text
             },
