@@ -226,7 +226,10 @@
         } else if not util.is-dict(label) {
           style.label = (text: label)
         } else if not "text" in label and util.not-none(inputs) {
+          // TODO: (ngb) add input-label-format function
           style.label = (text: inputs.map(str).join(","))
+        } else {
+          style.label = label
         }
 
         let style = cetz.styles.resolve(
@@ -293,6 +296,7 @@
             } else {
               let d = util.cubic-derivative(start, end, ctrl1, ctrl2, style.label.pos)
               let a = cetz.vector.angle2((0, 0), d)
+              if a < 0deg { a += 360deg }
               if a > 90deg and a < 270deg {
                 a = cetz.vector.angle2((0, 0), cetz.vector.scale(d, -1))
               }
