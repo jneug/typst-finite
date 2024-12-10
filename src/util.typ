@@ -46,6 +46,34 @@
 )
 
 // =================================
+//  Helpers
+// =================================
+
+/// Calls #arg[value] with #sarg[args], if it is a #dtype("function") and returns the result or #arg[value] otherwise.
+#let call-or-get(value, ..args) = {
+  if is-func(value) {
+    return value(..args)
+  } else {
+    return value
+  }
+}
+
+#let assert-dict = assert.new(
+  is-dict,
+  message: v => "dictionary expected. got " + repr(v),
+)
+#let assert-spec = assert.new(
+  value => is-dict(value) and "finite-spec" in value,
+  message: v => "automaton specification expected. got " + repr(v),
+)
+
+#let assert-full-spec = assert.new(
+  value => is-dict(value) and ("finite-spec", "type", "transitions", "states", "initial", "final").all(k => k in value),
+  message: v => "full automaton specification expected. got " + repr(v),
+)
+
+
+// =================================
 //  Vectors
 // =================================
 
