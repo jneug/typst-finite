@@ -37,8 +37,10 @@
     label: (
       text: "",
       size: 1em,
+      // TODO: (ngb) rename to fill
       color: auto,
       pos: .5,
+      // TODO: (ngb) make default 1.0
       dist: .33,
       angle: auto,
     ),
