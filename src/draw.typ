@@ -46,29 +46,29 @@
         let style = style.named()
 
         // Prepare label
-        if not util.is.dict(label) {
+        if not util.is-dict(label) {
           style.insert("label", (text: label))
         } else {
           style.insert("label", label)
         }
-        if "text" not in style.label or util.is.a(style.label.text) {
+        if "text" not in style.label or util.is-auto(style.label.text) {
           style.label.insert("text", name)
         }
         // Prepare initial marking
         style.initial = (:)
-        if util.is.align(initial) {
+        if util.is-align(initial) {
           style.initial.insert("anchor", initial)
-        } else if util.is.str(initial) {
+        } else if util.is-str(initial) {
           style.initial.insert("label", (text: initial))
-        } else if util.is.dict(initial) {
+        } else if util.is-dict(initial) {
           style.initial = initial
-          if "label" in initial and util.is.str(initial.label) {
+          if "label" in initial and util.is-str(initial.label) {
             style.initial.label = (text: initial.label)
           }
         }
 
         // Prepare padding
-        if "padding" not in style.label or util.is.a(style.label.padding) {
+        if "padding" not in style.label or util.is-auto(style.label.padding) {
           style.label.insert("padding", ctx.style.padding)
         }
 
@@ -205,10 +205,10 @@
         let style = style.named()
 
         // Prepare inputs
-        let inputs = if util.is.not-empty(inputs) {
-          if util.is.str(inputs) {
+        let inputs = if util.not-empty(inputs) {
+          if util.is-str(inputs) {
             inputs.split(",")
-          } else if not util.is.arr(inputs) {
+          } else if not util.is-arr(inputs) {
             (inputs,)
           } else {
             inputs
@@ -217,15 +217,15 @@
           none
         }
         // Prepare label
-        if util.is.a(label) {
-          if util.is.not-none(inputs) {
+        if util.is-auto(label) {
+          if util.not-none(inputs) {
             style.label = (text: inputs.map(str).join(","))
           } else {
             style.label = (text: none)
           }
-        } else if not util.is.dict(label) {
+        } else if not util.is-dict(label) {
           style.label = (text: label)
-        } else if not "text" in label and util.is.not-none(inputs) {
+        } else if not "text" in label and util.not-none(inputs) {
           style.label = (text: inputs.map(str).join(","))
         }
 
@@ -272,7 +272,7 @@
         )
         cetz.draw.copy-anchors("arrow")
 
-        if not util.is.empty(style.label.text) {
+        if not util.is-empty(style.label.text) {
           style.label.size = cetz.util.resolve-number(ctx, style.label.size) * ctx.length
 
           if style.label.color == auto {

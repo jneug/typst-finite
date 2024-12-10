@@ -39,7 +39,7 @@
   anchor: anchor,
   ctx => {
     let dir = dir
-    if util.is.any-type("alignment", "2d alignment", dir) {
+    if util.is-any-type("alignment", "2d alignment", dir) {
       dir = util.align-to-vec(dir)
     }
     dir = cetz.vector.norm(dir)
@@ -128,7 +128,7 @@
     let len = radii.values().fold(0, (s, r) => s + 2 * r + spacing)
 
     let radius = radius
-    if util.is.a(radius) {
+    if util.is-auto(radius) {
       radius = len / (2 * calc.pi)
     } else {
       len = 2 * radius * calc.pi
@@ -194,7 +194,7 @@
   ctx => {
     let (_, coordinates) = cetz.coordinate.resolve(ctx, position)
 
-    let spacing = if not util.is.arr(spacing) {
+    let spacing = if not util.is-arr(spacing) {
       (x: spacing, y: spacing)
     } else {
       (x: spacing.first(), y: spacing.last())
@@ -255,7 +255,7 @@
   ctx => {
     let (_, coordinates) = cetz.coordinate.resolve(ctx, position)
 
-    let spacing = if not util.is.arr(spacing) {
+    let spacing = if not util.is-arr(spacing) {
       (x: spacing, y: spacing)
     } else {
       (x: spacing.first(), y: spacing.last())
@@ -391,14 +391,14 @@
 
     let (_, elements) = util.resolve-zipped(ctx, body)
 
-    if util.is.int(grouping) {
+    if util.is-int(grouping) {
       for (i, (cetz-element, element)) in elements.enumerate() {
         if calc.rem(i, grouping) == 0 {
           groups.push(())
         }
         groups.last().push(cetz-element)
       }
-    } else if util.is.arr(grouping) {
+    } else if util.is-arr(grouping) {
       // Collect States into groups
       for (group) in grouping {
         groups.push(())
@@ -419,7 +419,7 @@
     let last-name = none
     for (i, group) in groups.enumerate() {
       let group-layout
-      if util.is.arr(layout) {
+      if util.is-arr(layout) {
         if layout.len() > i {
           group-layout = layout.at(i)
         } else {

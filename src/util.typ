@@ -1,6 +1,5 @@
 // Package imports
-#import "@preview/t4t:0.3.2": get, def, is, assert, math
-#import "@preview/cetz:0.3.0"
+#import "@preview/t4t:0.4.0": *
 #import "@preview/cetz:0.3.1"
 
 #import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
@@ -260,10 +259,10 @@
   for (key, values) in table {
     let new-values = (:)
 
-    if is.not-none(values) {
+    if is-noneot-none(values) {
       for (kk, vv) in values {
         for i in def.as-arr(vv) {
-          if is.not-none(i) {
+          if is-noneot-none(i) {
             i = str(i)
             if i not in new-values {
               new-values.insert(i, (kk,))
@@ -301,31 +300,32 @@
 
 /// Creates a full specification for a finite automaton.
 #let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
+  // TODO: (ngb) add asserts to react to malicious specs
   if "transitions" not in spec {
     spec = (transitions: spec)
   }
   if "states" not in spec {
-    if is.a(states) {
+    if is-auto(states) {
       states = spec.transitions.keys()
     }
     spec.insert("states", states)
   }
   if "initial" not in spec {
-    if is.a(initial) {
+    if is-auto(initial) {
       initial = spec.states.first()
     }
     spec.insert("initial", initial)
   }
   if "final" not in spec {
-    if is.a(final) {
+    if is-auto(final) {
       final = (spec.states.last(),)
-    } else if is.n(final) {
+    } else if is-none(final) {
       final = ()
     }
     spec.insert("final", final)
   }
   if "inputs" not in spec {
-    if is.a(inputs) {
+    if is-auto(inputs) {
       inputs = get-inputs(spec.transitions)
     }
     spec.insert("inputs", inputs)

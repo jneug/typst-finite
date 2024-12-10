@@ -86,11 +86,11 @@
   spec = to-spec(spec, initial: initial, final: final)
 
   // use a dict with coordinates as custom layout
-  if util.is.dict(layout) {
+  if util.is-dict(layout) {
     layout = _layout.custom.with(positions: layout)
   }
 
-  let layout-name(p) = ("aut", p).filter(util.is.not-none).join(".")
+  let layout-name(p) = ("aut", p).filter(util.not-none).join(".")
 
   cetz.canvas(
     ..canvas-styles,
@@ -119,14 +119,14 @@
 
       // Transitions don't need to be positioned
       for (from, transitions) in spec.transitions {
-        if util.is.dict(transitions) {
+        if util.is-dict(transitions) {
           for (to, inputs) in transitions {
             let name = from + "-" + to
 
             // prepare inputs (may be a string or int)
             if inputs == none {
               inputs = ()
-            } else if not util.is.arr(inputs) {
+            } else if not util.is-arr(inputs) {
               inputs = str(inputs).split(",")
             }
 
@@ -135,7 +135,7 @@
               name,
               default: input-format(inputs),
             )
-            if util.is.dict(label) and "text" not in label {
+            if util.is-dict(label) and "text" not in label {
               label.text = input-format(inputs)
             }
 
@@ -209,11 +209,11 @@
   let table-cnt = ()
   for (state, transitions) in spec.transitions {
     table-cnt.push(format(0, state))
-    if util.is.dict(transitions) {
+    if util.is-dict(transitions) {
       for (i, char) in spec.inputs.enumerate() {
         let to = ()
         for (name, label) in transitions {
-          if util.is.str(label) {
+          if util.is-str(label) {
             label = label.split(",")
           }
           label = util.def.as-arr(label).map(str)
