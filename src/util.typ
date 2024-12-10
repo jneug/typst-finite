@@ -1,6 +1,7 @@
 // Package imports
 #import "@preview/t4t:0.3.2": get, def, is, assert, math
 #import "@preview/cetz:0.3.0"
+#import "@preview/cetz:0.3.1"
 
 #import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
 
