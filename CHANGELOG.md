@@ -1,5 +1,14 @@
 # Changelog
 
+### Version 0.5.0
+
+- :warning: New layout system:
+	- Layouts are no longer CeTZ groups and only are used as a parameter to `#automaton`.
+- :warning: Breaking style changes:
+	- Changed label color attribute from `color` to `fill` for consistency.
+	- The default for `state.label.fill` and `transition.label.fill` is now `none` and sets the color of the label to `stroke.paint`.
+	- The default value for `transition.curve` is now `1.0` for an easier understanding of the influence on the curvature.
+
 ### Version 0.4.2
 
 - Fixed label rotation for transitions.
