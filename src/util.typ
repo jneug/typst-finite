@@ -13,7 +13,7 @@
     fill: white,
     stroke: auto,
     radius: .6,
-    extrude: .9,
+    extrude: .88,
     label: (
       text: auto,
       size: 1em,
