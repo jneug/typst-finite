@@ -287,10 +287,10 @@
   for (key, values) in table {
     let new-values = (:)
 
-    if is-noneot-none(values) {
+    if not-none(values) {
       for (kk, vv) in values {
         for i in def.as-arr(vv) {
-          if is-noneot-none(i) {
+          if not-none(i) {
             i = str(i)
             if i not in new-values {
               new-values.insert(i, (kk,))
