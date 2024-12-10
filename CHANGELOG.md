@@ -1,5 +1,11 @@
 # Changelog
 
+### Unreleased
+
+- Added `flaci` module to load and display files exported from FLACI:
+	- `flaci.load` loads an FLACI file as a `finite` automaton specification.
+	- `flaci.autoamton` displays an FLACI file as an `finite` automaton.
+
 ### Version 0.4.1
 
 - Fixes error in `#powerset` function (#8).
