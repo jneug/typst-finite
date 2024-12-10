@@ -1,0 +1,120 @@
+{
+	"name": "[NEA] abacc",
+	"description": "",
+	"type": "NEA",
+	"automaton": {
+		"simulationInput": [],
+		"Alphabet": [
+			"a",
+			"b",
+			"c"
+		],
+		"StackAlphabet": [
+			"|"
+		],
+		"States": [
+			{
+				"ID": 1,
+				"Name": "q0",
+				"x": 150,
+				"y": 150,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 1,
+						"Target": 2,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"a"
+						]
+					}
+				],
+				"Start": true
+			},
+			{
+				"ID": 2,
+				"Name": "q1",
+				"x": 320,
+				"y": 150,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 2,
+						"Target": 2,
+						"x": 0,
+						"y": -150,
+						"Labels": [
+							"a"
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 3,
+						"x": 20,
+						"y": 0,
+						"Labels": [
+							"b",
+							"c"
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 4,
+						"x": 50,
+						"y": -20,
+						"Labels": [
+							"b",
+							"c"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 3,
+				"Name": "q2",
+				"x": 320,
+				"y": 310,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 3,
+						"Target": 2,
+						"x": 40,
+						"y": 0,
+						"Labels": [
+							"a"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 4,
+				"Name": "q3",
+				"x": 500,
+				"y": 150,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 4,
+						"Target": 2,
+						"x": 50,
+						"y": -10,
+						"Labels": [
+							"c"
+						]
+					}
+				],
+				"Start": false
+			}
+		],
+		"lastInputs": []
+	},
+	"GUID": "ro3ujamz"
+}

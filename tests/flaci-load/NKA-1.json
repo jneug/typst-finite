@@ -1,0 +1,201 @@
+{
+	"name": "Vorabi 24",
+	"description": "",
+	"type": "NKA",
+	"automaton": {
+		"Alphabet": [
+			"X",
+			"$",
+			"1"
+		],
+		"StackAlphabet": [
+			"#",
+			"A",
+			"B",
+			"C",
+			"X"
+		],
+		"States": [
+			{
+				"ID": 1,
+				"Name": "q0",
+				"x": 150,
+				"y": 150,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 1,
+						"Target": 2,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							[
+								"#",
+								"",
+								[
+									"A",
+									"C",
+									"A",
+									"B",
+									"#"
+								]
+							]
+						]
+					}
+				],
+				"Start": true,
+				"Final": false
+			},
+			{
+				"ID": 3,
+				"Name": "q2",
+				"x": 590,
+				"y": 150,
+				"Radius": 30,
+				"Transitions": [],
+				"Start": false,
+				"Final": true
+			},
+			{
+				"ID": 2,
+				"Name": "q1",
+				"x": 370,
+				"y": 150,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 2,
+						"Target": 3,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							[
+								"#",
+								"",
+								[]
+							]
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 2,
+						"x": 0,
+						"y": 40,
+						"Labels": [
+							[
+								"X",
+								"X",
+								[]
+							],
+							[
+								"C",
+								"1",
+								[]
+							],
+							[
+								"C",
+								"$",
+								[]
+							],
+							[
+								"A",
+								"X",
+								[]
+							],
+							[
+								"A",
+								"X",
+								[
+									"C",
+									"X"
+								]
+							],
+							[
+								"B",
+								"",
+								[
+									"A"
+								]
+							],
+							[
+								"B",
+								"",
+								[
+									"A",
+									"B"
+								]
+							]
+						]
+					}
+				],
+				"Start": false,
+				"Final": false
+			}
+		],
+		"acceptCache": [],
+		"simulationInput": [
+			"X",
+			"$",
+			"X",
+			"$",
+			"X",
+			"X",
+			"1",
+			"X",
+			"X",
+			"X",
+			"$",
+			"X"
+		],
+		"lastInputs": [
+			[
+				"X",
+				"$",
+				"X",
+				"$",
+				"X",
+				"X",
+				"1",
+				"X",
+				"X",
+				"X",
+				"$",
+				"X"
+			],
+			[
+				"X",
+				"X",
+				"$",
+				"X"
+			],
+			[
+				"$",
+				"X",
+				"X",
+				"1",
+				"X"
+			],
+			[
+				"X",
+				"$",
+				"X",
+				"X",
+				"1",
+				"X"
+			],
+			[
+				"X",
+				"$",
+				"X",
+				"X"
+			],
+			[
+				"X",
+				"X",
+				"X",
+				"X"
+			]
+		]
+	},
+	"GUID": "ibbsud0or"
+}
