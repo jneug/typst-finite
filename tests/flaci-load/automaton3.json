@@ -1,0 +1,217 @@
+﻿{
+	"name": "Schatzsuche",
+	"description": "",
+	"type": "DEA",
+	"automaton": {
+		"acceptCache": [],
+		"simulationInput": [
+			"I",
+			"I",
+			"I"
+		],
+		"Alphabet": [
+			"I",
+			"V"
+		],
+		"StackAlphabet": [
+			"|"
+		],
+		"States": [
+			{
+				"ID": 1,
+				"Name": "q0",
+				"x": 220,
+				"y": 450,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 1,
+						"Target": 2,
+						"x": -20,
+						"y": 20,
+						"Labels": [
+							"I"
+						]
+					},
+					{
+						"Source": 1,
+						"Target": 5,
+						"x": -30,
+						"y": 30,
+						"Labels": [
+							"V"
+						]
+					}
+				],
+				"Start": true
+			},
+			{
+				"ID": 2,
+				"Name": "q1",
+				"x": 360,
+				"y": 550,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 2,
+						"Target": 3,
+						"x": -10,
+						"y": 10,
+						"Labels": [
+							"I"
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 4,
+						"x": -20,
+						"y": 20,
+						"Labels": [
+							"V"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 3,
+				"Name": "q2",
+				"x": 640,
+				"y": 510,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 3,
+						"Target": 4,
+						"x": 10,
+						"y": -10,
+						"Labels": [
+							"I"
+						]
+					},
+					{
+						"Source": 3,
+						"Target": 9,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"V"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 4,
+				"Name": "q3",
+				"x": 770,
+				"y": 650,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 4,
+						"Target": 9,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"I",
+							"V"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 5,
+				"Name": "q4",
+				"x": 360,
+				"y": 360,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 5,
+						"Target": 8,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"I"
+						]
+					},
+					{
+						"Source": 5,
+						"Target": 9,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"V"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 8,
+				"Name": "q7",
+				"x": 510,
+				"y": 400,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 8,
+						"Target": 3,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"I"
+						]
+					},
+					{
+						"Source": 8,
+						"Target": 9,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"V"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 9,
+				"Name": "TRAP",
+				"x": 810,
+				"y": 370,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 9,
+						"Target": 9,
+						"x": 0,
+						"y": -40,
+						"Labels": [
+							"I",
+							"V"
+						]
+					}
+				],
+				"Start": false
+			}
+		],
+		"lastInputs": [
+			[
+				"I",
+				"I",
+				"I"
+			]
+		]
+	},
+	"GUID": "rz7hb617s"
+}

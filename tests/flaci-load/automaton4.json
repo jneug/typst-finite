@@ -1,0 +1,272 @@
+﻿{
+	"name": "Plusterme",
+	"description": "",
+	"type": "DEA",
+	"automaton": {
+		"acceptCache": [],
+		"simulationInput": [],
+		"Alphabet": [
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+			"8",
+			"9",
+			"+",
+			"OPERATOR",
+			"OPERAND"
+		],
+		"StackAlphabet": [
+			"|"
+		],
+		"States": [
+			{
+				"ID": 1,
+				"Name": "q0",
+				"x": 170,
+				"y": 160,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 1,
+						"Target": 2,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					},
+					{
+						"Source": 1,
+						"Target": 3,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"0"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 2,
+				"Name": "q1",
+				"x": 390,
+				"y": 160,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 2,
+						"Target": 4,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"+"
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 2,
+						"x": 0,
+						"y": -150,
+						"Labels": [
+							"0",
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 3,
+				"Name": "q2",
+				"x": 420,
+				"y": 330,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 3,
+						"Target": 4,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"+"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 4,
+				"Name": "q3",
+				"x": 630,
+				"y": 170,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 4,
+						"Target": 5,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					},
+					{
+						"Source": 4,
+						"Target": 6,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"0"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 5,
+				"Name": "q4",
+				"x": 860,
+				"y": 170,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 5,
+						"Target": 5,
+						"x": 0,
+						"y": -150,
+						"Labels": [
+							"0",
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 6,
+				"Name": "q5",
+				"x": 860,
+				"y": 310,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [],
+				"Start": false
+			},
+			{
+				"ID": 7,
+				"Name": "s0",
+				"x": 230,
+				"y": 430,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 7,
+						"Target": 8,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"OPERAND"
+						]
+					}
+				],
+				"Start": true
+			},
+			{
+				"ID": 8,
+				"Name": "s1",
+				"x": 400,
+				"y": 430,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 8,
+						"Target": 9,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"OPERATOR"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 9,
+				"Name": "s2",
+				"x": 590,
+				"y": 430,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 9,
+						"Target": 10,
+						"x": 0,
+						"y": 0,
+						"Labels": [
+							"OPERAND"
+						]
+					}
+				],
+				"Start": false
+			},
+			{
+				"ID": 10,
+				"Name": "s3",
+				"x": 770,
+				"y": 430,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [],
+				"Start": false
+			}
+		],
+		"lastInputs": []
+	},
+	"GUID": "f75paviy0"
+}

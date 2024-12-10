@@ -1,0 +1,102 @@
+﻿{
+	"name": "TEIL2: Wort mit gerader Anzahl an Nullen",
+	"description": "",
+	"type": "DEA",
+	"automaton": {
+		"acceptCache": [],
+		"simulationInput": [],
+		"Alphabet": [
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+			"8",
+			"9"
+		],
+		"StackAlphabet": [
+			"|"
+		],
+		"States": [
+			{
+				"ID": 1,
+				"Name": "q0",
+				"x": 220,
+				"y": 130,
+				"Final": false,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 1,
+						"Target": 1,
+						"x": 0,
+						"y": -150,
+						"Labels": [
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					},
+					{
+						"Source": 1,
+						"Target": 2,
+						"x": 0,
+						"y": -80,
+						"Labels": [
+							"0"
+						]
+					}
+				],
+				"Start": true
+			},
+			{
+				"ID": 2,
+				"Name": "q1",
+				"x": 510,
+				"y": 130,
+				"Final": true,
+				"Radius": 30,
+				"Transitions": [
+					{
+						"Source": 2,
+						"Target": 2,
+						"x": 0,
+						"y": -150,
+						"Labels": [
+							"1",
+							"2",
+							"3",
+							"4",
+							"5",
+							"6",
+							"7",
+							"8",
+							"9"
+						]
+					},
+					{
+						"Source": 2,
+						"Target": 1,
+						"x": 0,
+						"y": -50,
+						"Labels": [
+							"0"
+						]
+					}
+				],
+				"Start": false
+			}
+		],
+		"lastInputs": []
+	},
+	"GUID": "hiicmv2p1"
+}
