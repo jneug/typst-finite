@@ -79,6 +79,23 @@
   return cetz.vector.norm(v)
 }
 
+#let vec-to-align(vec) = {
+  let angle = cetz.vector.angle2((0, 0), vec) / 1deg
+  if angle < 0 { angle = angle + 360 }
+  let idx = calc.round((angle - 22.5) / 45 + .5)
+
+  return (
+    right,
+    top + right,
+    top,
+    top + left,
+    left,
+    bottom + left,
+    bottom,
+    bottom + right,
+  ).at(int(idx))
+}
+
 
 // =================================
 //  Bezier
