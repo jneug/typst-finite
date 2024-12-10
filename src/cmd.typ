@@ -111,9 +111,6 @@
           anchor: anchors.at(name, default: none),
           ..style.at(name, default: (:)),
         )
-
-        util.dot(coordinates.at(name), fill: green)
-        util.dot(name + "." + anchors.at(name, default: "center"))
       }
 
       // Create transitions
