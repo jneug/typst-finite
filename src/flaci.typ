@@ -3,11 +3,20 @@
 
 #let load(data) = {
   assert(data.at("type", default: "ERROR") in ("DEA", "NEA"))
-
-  let scaling = .02
-
   let automaton = data.at("automaton", default: (:))
 
+  // Scaling factor for FLACI coordinates to CeTZ conversion
+  let scaling = .02
+
+  // Some FLACI default styles
+  let style = (
+    transition: (
+      curve: 0,
+      label: (angle: 0deg),
+    ),
+  )
+
+  // Variable declarations
   let transitions = (:)
   let states = ()
   let final = ()
@@ -15,7 +24,8 @@
   let inputs = automaton.at("Alphabet", default: ())
   let id-map = (:)
   let layout = (:)
-  let style = (transition: (curve: 0))
+
+  // Parse states
   for state in automaton.at("States", default: ()) {
     let name = state.Name
 
@@ -69,7 +79,7 @@
     transitions.insert(state.Name, state-transitions)
   }
 
-  // Do some cleanup of style (eg double transitions)
+  // Do some cleanup of style (eg curve for double transitions)
   for (state, state-transitions) in transitions {
     for target-state in state-transitions.keys() {
       if state in transitions.at(target-state) {
