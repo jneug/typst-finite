@@ -39,125 +39,123 @@
 
   // Create element function
   // TODO: (ngb) remove wrapper
-  util.state-wrapper(
-    cetz.draw.group(
-      name: name,
-      anchor: anchor,
-      ctx => {
-        let style = style.named()
+  cetz.draw.group(
+    name: name,
+    anchor: anchor,
+    ctx => {
+      let style = style.named()
 
-        // Prepare label
-        if not util.is-dict(label) {
-          style.insert("label", (text: label))
+      // Prepare label
+      if not util.is-dict(label) {
+        style.insert("label", (text: label))
+      } else {
+        style.insert("label", label)
+      }
+      if "text" not in style.label or util.is-auto(style.label.text) {
+        style.label.insert("text", name)
+      }
+      // Prepare initial marking
+      style.initial = (:)
+      if util.is-align(initial) {
+        style.initial.insert("anchor", initial)
+      } else if util.is-str(initial) {
+        style.initial.insert("label", (text: initial))
+      } else if util.is-dict(initial) {
+        style.initial = initial
+        if "label" in initial and util.is-str(initial.label) {
+          style.initial.label = (text: initial.label)
+        }
+      }
+
+      // Prepare padding
+      if "padding" not in style.label or util.is-auto(style.label.padding) {
+        style.label.insert("padding", ctx.style.padding)
+      }
+
+      let style = cetz.styles.resolve(
+        ctx.style,
+        merge: style,
+        base: util.default-style.state,
+        root: "state",
+      )
+
+      // resolve coordinates
+      let (_, pos) = cetz.coordinate.resolve(ctx, position)
+
+      cetz.draw.circle(pos, name: "state", ..style)
+      if final {
+        cetz.draw.circle(pos, stroke: style.stroke, radius: style.radius * style.extrude)
+      }
+      if initial != false {
+        let color = if style.initial.stroke == auto {
+          stroke(style.stroke).paint
         } else {
-          style.insert("label", label)
-        }
-        if "text" not in style.label or util.is-auto(style.label.text) {
-          style.label.insert("text", name)
-        }
-        // Prepare initial marking
-        style.initial = (:)
-        if util.is-align(initial) {
-          style.initial.insert("anchor", initial)
-        } else if util.is-str(initial) {
-          style.initial.insert("label", (text: initial))
-        } else if util.is-dict(initial) {
-          style.initial = initial
-          if "label" in initial and util.is-str(initial.label) {
-            style.initial.label = (text: initial.label)
-          }
+          stroke(style.initial.stroke).paint
         }
 
-        // Prepare padding
-        if "padding" not in style.label or util.is-auto(style.label.padding) {
-          style.label.insert("padding", ctx.style.padding)
-        }
-
-        let style = cetz.styles.resolve(
-          ctx.style,
-          merge: style,
-          base: util.default-style.state,
-          root: "state",
+        let initial-anchor = util.to-anchor(style.initial.anchor)
+        let align-vec = util.align-to-vec(style.initial.anchor)
+        let initial-start = (
+          rel: cetz.vector.scale(
+            align-vec,
+            style.initial.scale,
+          ),
+          to: "state." + initial-anchor,
         )
 
-        // resolve coordinates
-        let (_, pos) = cetz.coordinate.resolve(ctx, position)
-
-        cetz.draw.circle(pos, name: "state", ..style)
-        if final {
-          cetz.draw.circle(pos, stroke: style.stroke, radius: style.radius * style.extrude)
-        }
-        if initial != false {
-          let color = if style.initial.stroke == auto {
-            stroke(style.stroke).paint
-          } else {
-            stroke(style.initial.stroke).paint
-          }
-
-          let initial-anchor = util.to-anchor(style.initial.anchor)
-          let align-vec = util.align-to-vec(style.initial.anchor)
-          let initial-start = (
-            rel: cetz.vector.scale(
-              align-vec,
-              style.initial.scale,
-            ),
-            to: "state." + initial-anchor,
-          )
-
-          cetz.draw.line(
-            name: "initial",
-            initial-start,
-            "state." + initial-anchor,
-            mark: (end: "straight"),
-            stroke: style.initial.stroke,
-          )
-          if style.initial.label != none {
-            cetz.draw.content(
-              name: "initial-label",
-              (
-                rel: util.vector-set-len(
-                  util.vector-rotate(
-                    initial-start.rel,
-                    if util.abs-angle-between(align-vec, (0, 0), -90deg, 90deg) {
-                      -90deg
-                    } else {
-                      90deg
-                    },
-                  ),
-                  style.initial.label.dist,
-                ),
-                to: initial-start,
-              ),
-              anchor: "south",
-              angle: util.label-angle(align-vec, style.initial.anchor),
-              text(style.initial.label.size, color, style.initial.label.text),
-            )
-          }
-        }
-        if label not in (none, (:)) {
-          if style.label.fill in (auto, none) {
-            style.label.fill = stroke(style.stroke).paint
-          }
-          if style.label.fill == auto {
-            style.label.fill = black
-          }
-
+        cetz.draw.line(
+          name: "initial",
+          initial-start,
+          "state." + initial-anchor,
+          mark: (end: "straight"),
+          stroke: style.initial.stroke,
+        )
+        if style.initial.label != none {
           cetz.draw.content(
-            "state.center",
-            name: "label",
-            anchor: "center",
-            padding: style.label.padding,
-            text(
-              size: style.label.size,
-              fill: style.label.fill,
-              style.label.text,
+            name: "initial-label",
+            (
+              rel: util.vector-set-len(
+                util.vector-rotate(
+                  initial-start.rel,
+                  if util.abs-angle-between(align-vec, (0, 0), -90deg, 90deg) {
+                    -90deg
+                  } else {
+                    90deg
+                  },
+                ),
+                style.initial.label.dist,
+              ),
+              to: initial-start,
             ),
+            anchor: "south",
+            angle: util.label-angle(align-vec, style.initial.anchor),
+            text(style.initial.label.size, color, style.initial.label.text),
           )
         }
-        cetz.draw.copy-anchors("state")
-        cetz.draw.anchor("default", "state.center")
-      },
-    ),
+      }
+      if label not in (none, (:)) {
+        if style.label.fill in (auto, none) {
+          style.label.fill = stroke(style.stroke).paint
+        }
+        if style.label.fill == auto {
+          style.label.fill = black
+        }
+
+        cetz.draw.content(
+          "state.center",
+          name: "label",
+          anchor: "center",
+          padding: style.label.padding,
+          text(
+            size: style.label.size,
+            fill: style.label.fill,
+            style.label.text,
+          ),
+        )
+      }
+      cetz.draw.copy-anchors("state")
+      cetz.draw.anchor("default", "state.center")
+    },
   )
   // Update prev coordinate
   cetz.draw.set-ctx(ctx => {
@@ -204,127 +202,123 @@
   util.assert.all-of-type("string", from, to)
   let name = from.split(".").last() + "-" + to.split(".").last()
 
-  util.transition-wrapper(
-    from,
-    to,
-    cetz.draw.group(
-      name: name,
-      ctx => {
-        let style = style.named()
+  cetz.draw.group(
+    name: name,
+    ctx => {
+      let style = style.named()
 
-        // Prepare inputs
-        let inputs = if util.not-empty(inputs) {
-          if util.is-str(inputs) {
-            inputs.split(",")
-          } else if not util.is-arr(inputs) {
-            (inputs,)
-          } else {
-            inputs
-          }
+      // Prepare inputs
+      let inputs = if util.not-empty(inputs) {
+        if util.is-str(inputs) {
+          inputs.split(",")
+        } else if not util.is-arr(inputs) {
+          (inputs,)
         } else {
-          none
+          inputs
         }
-        // Prepare label
-        if util.is-auto(label) {
-          if util.not-none(inputs) {
-            style.label = (text: inputs.map(str).join(","))
-          } else {
-            style.label = (text: none)
-          }
-        } else if not util.is-dict(label) {
-          style.label = (text: label)
-        } else if not "text" in label and util.not-none(inputs) {
-          // TODO: (ngb) add input-label-format function
+      } else {
+        none
+      }
+      // Prepare label
+      if util.is-auto(label) {
+        if util.not-none(inputs) {
           style.label = (text: inputs.map(str).join(","))
         } else {
-          style.label = label
+          style.label = (text: none)
+        }
+      } else if not util.is-dict(label) {
+        style.label = (text: label)
+      } else if not "text" in label and util.not-none(inputs) {
+        // TODO: (ngb) add input-label-format function
+        style.label = (text: inputs.map(str).join(","))
+      } else {
+        style.label = label
+      }
+
+      let style = cetz.styles.resolve(
+        ctx.style,
+        merge: style,
+        base: util.default-style.transition,
+        root: "transition",
+      )
+
+      let (_, start, f-center, f-right, end, t-center, t-right) = cetz.coordinate.resolve(
+        ctx,
+        from + ".state",
+        from + ".state.center",
+        from + ".state.east",
+        to + ".state",
+        to + ".state.center",
+        to + ".state.east",
+      )
+      let (start-rad, end-rad) = (
+        f-right.at(0) - f-center.at(0),
+        t-right.at(0) - t-center.at(0),
+      )
+      let (start, end, ctrl1, ctrl2) = util.transition-pts(
+        start,
+        end,
+        start-rad,
+        end-rad,
+        curve: style.curve * .75,
+        anchor: anchor,
+      )
+      cetz.draw.bezier(
+        name: "arrow",
+        start,
+        end,
+        ctrl1,
+        ctrl2,
+        mark: (
+          end: ">",
+          stroke: style.stroke,
+          fill: stroke(style.stroke).paint,
+        ),
+        ..style,
+      )
+      cetz.draw.copy-anchors("arrow")
+
+      if not util.is-empty(style.label.text) {
+        style.label.size = cetz.util.resolve-number(ctx, style.label.size) * ctx.length
+
+        if style.label.fill in (auto, none) {
+          style.label.fill = stroke(style.stroke).paint
+        }
+        if style.label.fill == auto {
+          style.label.fill = black
         }
 
-        let style = cetz.styles.resolve(
-          ctx.style,
-          merge: style,
-          base: util.default-style.transition,
-          root: "transition",
+        let label-pt = util.label-pt(start, end, ctrl1, ctrl2, style, loop: start == end)
+        cetz.draw.content(
+          name: "label",
+          label-pt,
+          angle: if type(style.label.angle) == angle {
+            style.label.angle
+          } else if start == end {
+            0deg
+          } else {
+            let d = util.cubic-derivative(start, end, ctrl1, ctrl2, style.label.pos)
+            let a = cetz.vector.angle2((0, 0), d)
+            if a < 0deg { a += 360deg }
+            if a > 90deg and a < 270deg {
+              a = cetz.vector.angle2((0, 0), cetz.vector.scale(d, -1))
+            }
+            a
+          },
+          {
+            let label-style = (size: style.label.size)
+            if style.label.fill != none {
+              label-style.insert("fill", style.label.fill)
+            }
+            set text(
+              size: style.label.size,
+              fill: style.label.fill,
+            )
+            style.label.text
+          },
         )
-
-        let (_, start, f-center, f-right, end, t-center, t-right) = cetz.coordinate.resolve(
-          ctx,
-          from + ".state",
-          from + ".state.center",
-          from + ".state.east",
-          to + ".state",
-          to + ".state.center",
-          to + ".state.east",
-        )
-        let (start-rad, end-rad) = (
-          f-right.at(0) - f-center.at(0),
-          t-right.at(0) - t-center.at(0),
-        )
-        let (start, end, ctrl1, ctrl2) = util.transition-pts(
-          start,
-          end,
-          start-rad,
-          end-rad,
-          curve: style.curve * .75,
-          anchor: anchor,
-        )
-        cetz.draw.bezier(
-          name: "arrow",
-          start,
-          end,
-          ctrl1,
-          ctrl2,
-          mark: (
-            end: ">",
-            stroke: style.stroke,
-            fill: stroke(style.stroke).paint,
-          ),
-          ..style,
-        )
-        cetz.draw.copy-anchors("arrow")
-
-        if not util.is-empty(style.label.text) {
-          style.label.size = cetz.util.resolve-number(ctx, style.label.size) * ctx.length
-
-          if style.label.fill in (auto, none) {
-            style.label.fill = stroke(style.stroke).paint
-          }
-          if style.label.fill == auto {
-            style.label.fill = black
-          }
-
-          let label-pt = util.label-pt(start, end, ctrl1, ctrl2, style, loop: start == end)
-          cetz.draw.content(
-            name: "label",
-            label-pt,
-            angle: if type(style.label.angle) == angle {
-              style.label.angle
-            } else if start == end {
-              0deg
-            } else {
-              let d = util.cubic-derivative(start, end, ctrl1, ctrl2, style.label.pos)
-              let a = cetz.vector.angle2((0, 0), d)
-              if a < 0deg { a += 360deg }
-              if a > 90deg and a < 270deg {
-                a = cetz.vector.angle2((0, 0), cetz.vector.scale(d, -1))
-              }
-              a
-            },
-            {
-              let label-style = (size: style.label.size)
-              if style.label.fill != none {
-                label-style.insert("fill", style.label.fill)
-              }
-              set text(
-                size: style.label.size,
-                fill: style.label.fill,
-              )
-              style.label.text
-            },
-          )
-        }
-      },
-    ),
+      }
+    },
   )
   // Update prev coordinate
   cetz.draw.set-ctx(ctx => {
