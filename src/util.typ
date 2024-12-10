@@ -360,7 +360,7 @@
   } else {
     spec.inputs = spec.inputs.map(str).sorted()
   }
-  return spec
+  return spec + (finite-spec: true, type: "DEA")
 }
 
 
