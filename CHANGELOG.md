@@ -1,5 +1,12 @@
 # Changelog
 
+### Version 0.4.2
+
+- Fixed label rotation for transitions.
+- Bumped dependencies:
+	- CeTZ 0.3.0 :arrow upper right: 0.3.1
+	- t4t 0.3.1 :arrow upper right: 0.4.0
+
 ### Version 0.4.1
 
 - Fixes error in `#powerset` function (#8).
