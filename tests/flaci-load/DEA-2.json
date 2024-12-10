@@ -1,4 +1,4 @@
-﻿{
+{
 	"name": "Schatzsuche",
 	"description": "",
 	"type": "DEA",
@@ -37,7 +37,7 @@
 					{
 						"Source": 1,
 						"Target": 5,
-						"x": -30,
+						"x": -20,
 						"y": 30,
 						"Labels": [
 							"V"

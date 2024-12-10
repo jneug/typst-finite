@@ -1,4 +1,4 @@
-﻿{
+{
 	"name": "TEIL2: Wort mit gerader Anzahl an Nullen",
 	"description": "",
 	"type": "DEA",
@@ -26,14 +26,14 @@
 				"Name": "q0",
 				"x": 220,
 				"y": 130,
-				"Final": true,
+				"Final": false,
 				"Radius": 30,
 				"Transitions": [
 					{
 						"Source": 1,
 						"Target": 1,
-						"x": -10,
-						"y": 150,
+						"x": 0,
+						"y": -150,
 						"Labels": [
 							"1",
 							"2",
@@ -50,7 +50,7 @@
 						"Source": 1,
 						"Target": 2,
 						"x": 0,
-						"y": -160,
+						"y": -80,
 						"Labels": [
 							"0"
 						]
@@ -61,9 +61,9 @@
 			{
 				"ID": 2,
 				"Name": "q1",
-				"x": 600,
-				"y": 120,
-				"Final": false,
+				"x": 510,
+				"y": 130,
+				"Final": true,
 				"Radius": 30,
 				"Transitions": [
 					{
@@ -87,7 +87,7 @@
 						"Source": 2,
 						"Target": 1,
 						"x": 0,
-						"y": -130,
+						"y": -50,
 						"Labels": [
 							"0"
 						]

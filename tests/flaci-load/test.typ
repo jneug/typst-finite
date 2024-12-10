@@ -2,9 +2,17 @@
 
 #set page(width: auto, height: auto, margin: 1cm)
 
-#for i in range(4) {
+#let automatons = (
+  "DEA-1",
+  "DEA-2",
+  "DEA-3",
+  "NEA-1",
+  // "NKA-1",
+)
+
+#for file in automatons {
   page[
-    #let aut = json("automaton" + str(i + 1) + ".json")
+    #let aut = json(file + ".json")
     #flaci.automaton(aut, style: (q1: (fill: green)))
   ]
 }
