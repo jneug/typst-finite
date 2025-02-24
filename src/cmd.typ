@@ -174,6 +174,14 @@
 /// ]
 ///
 /// - spec (spec): Automaton specification.
+/// - corner (content): Content for the top left corner.
+///   #example[```
+///   #finite.transition-table((
+///     q0: (q1: 0, q0: (1,0)),
+///     q1: (q0: 1, q2: (1,0)),
+///     q2: (q0: 1, q2: 0),
+///   ), corner: $delta$)
+///   ```]
 /// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
 /// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[states] is used.
 /// - format (function): A function to format the value in a table column. The function takes a column index and
@@ -198,6 +206,7 @@
 /// -> content
 #let transition-table(
   spec,
+  corner: [],
   initial: auto,
   final: auto,
   format: (col, v) => raw(str(v)),
@@ -234,7 +243,7 @@
     },
     align: center + horizon,
     ..table-style,
-    [], ..spec.inputs.map(raw),
+    corner, ..spec.inputs.map(raw),
     ..table-cnt
   )
 }
