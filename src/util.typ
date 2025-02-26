@@ -366,7 +366,43 @@
   return inputs.sorted()
 }
 
-/// Creates a full specification for a finite automaton.
+
+/// Checks if a given @type:automaton specification represents
+/// a deterministic automaton.
+///
+/// ```example
+/// #util.is-dea((
+///   q0: (q1: 1, q2: 1),
+/// ))
+/// #util.is-dea((
+///   q0: (q1: 1, q2: 0),
+/// ))
+/// ```
+///
+/// -> bool
+#let is-dea(
+  /// A transition table.
+  /// -> transition-table
+  table,
+) = {
+  for (_, transitions) in table {
+    let inp = ()
+    for (state, inputs) in transitions {
+      for i in def.as-arr(inputs) {
+        if i in inp {
+          return false
+        } else {
+          inp.push(i)
+        }
+      }
+    }
+  }
+
+  return true
+}
+
+
+
 #let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
   // TODO: (jneug) add asserts to react to malicious specs
   // TODO: (jneug) check for duplicate names
