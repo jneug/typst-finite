@@ -228,11 +228,12 @@
         }
       } else if not util.is-dict(label) {
         style.label = (text: label)
-      } else if not "text" in label and util.not-none(inputs) {
-        // TODO: (ngb) add input-label-format function
-        style.label = (text: inputs.map(str).join(","))
       } else {
         style.label = label
+      }
+      if not "text" in style.label and util.not-none(inputs) {
+        // TODO: (jneug) add input-label-format function
+        style.label.insert("text", inputs.map(str).join(","))
       }
 
       let style = cetz.styles.resolve(
@@ -241,6 +242,15 @@
         base: util.default-style.transition,
         root: "transition",
       )
+      // resolve loop styles on top
+      if from == to {
+        style = cetz.styles.resolve(
+          ctx.style,
+          merge: ctx.style.at("loop", default: (:)),
+          base: style,
+          root: "transition",
+        )
+      }
 
       let (_, start, f-center, f-right, end, t-center, t-right) = cetz.coordinate.resolve(
         ctx,
