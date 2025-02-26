@@ -19,9 +19,9 @@ regex = '''
 message_template = "Bump to {new_version}"
 tag_template = "v{new_version}"
 
-[[file]]
-src = "typst.toml"
-search = 'version = "{current_version}"'
+# [[file]]
+# src = "typst.toml"
+# search = 'version = "{current_version}"'
 
 [[file]]
 src = "README.md"

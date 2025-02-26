@@ -1,6 +1,7 @@
+
 [package]
 name = "finite"
-version = "0.4.1"
+version = "5.0.0"
 entrypoint = "src/finite.typ"
 authors = ["Jonas Neugebauer"]
 license = "MIT"
@@ -9,7 +10,7 @@ repository = "https://github.com/jneug/typst-finite"
 keywords = []
 categories = []
 disciplines = []
-compiler = "0.0.12"
+compiler = "0.13.0"
 exclude = [
 	".github",
 	"docs",
