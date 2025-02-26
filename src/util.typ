@@ -1,9 +1,16 @@
-// Package imports
+
+// Package dependencies
 #import "@preview/t4t:0.4.0": *
 #import "@preview/cetz:0.3.1"
-#import "@preview/valkyrie:0.2.1" as t
 
+// TODO: (jneug) implement scheme validation with valkyrie
+// #import "@preview/valkyrie:0.2.1" as t
+
+// TODO: (jneug) don't import into global scope
 #import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
+
+
+// TODO (jneug) refactor module and cleanup
 
 // =================================
 //  Defaults
