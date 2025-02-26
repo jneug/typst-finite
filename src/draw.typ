@@ -1,8 +1,7 @@
+
 // imports cetz and t4t
 #import "./util.typ"
 #import util: cetz
-
-#import "layout.typ"
 
 /// Draw a state at the given #arg[position].
 ///
@@ -38,7 +37,7 @@
   util.assert.no-pos(style)
 
   // Create element function
-  // TODO: (ngb) remove wrapper
+  // TODO: (jneug) remove wrapper
   cetz.draw.group(
     name: name,
     anchor: anchor,
@@ -198,6 +197,8 @@
   // No extra positional arguments from the style sink
   util.assert.no-pos(style)
 
+  // TODO: (jneug) allow labelsl with math or content
+
   // Name of two states required
   util.assert.all-of-type("string", from, to)
   let name = from.split(".").last() + "-" + to.split(".").last()
@@ -340,7 +341,7 @@
 
 /// Create a transition loop on a state.
 ///
-/// This is a shortcut for @@transition that takes only one
+/// This is a shortcut for @cmd:transition that takes only one
 /// state name instead of two.
 #let loop(state, inputs: none, label: auto, anchor: top, ..style) = transition(
   state,
@@ -375,4 +376,3 @@
     }
   }
 }
-
