@@ -1,5 +1,3 @@
-# for a description of available keys, see https://github.com/typst/packages/?tab=readme-ov-file#package-format
-
 [package]
 name = "finite"
 version = "0.4.1"
