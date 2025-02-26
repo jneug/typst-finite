@@ -51,6 +51,7 @@
       angle: auto,
     ),
   ),
+  loop: (:),
 )
 
 // =================================
@@ -70,6 +71,7 @@
   is-dict,
   message: v => "dictionary expected. got " + repr(v),
 )
+
 #let assert-spec = assert.new(
   value => is-dict(value) and "finite-spec" in value,
   message: v => "automaton specification expected. got " + repr(v),
@@ -180,9 +182,9 @@
 /// Calculate the location for a transitions label, based
 /// on its bezier points.
 #let label-pt(a, b, c, d, style, loop: false) = {
-  let pos = style.label.at("pos", default: default-style.transition.label.pos)
-  let dist = style.label.at("dist", default: default-style.transition.label.dist)
-  let curve = style.at("curve", default: default-style.transition.curve)
+  let pos = style.label.pos // style.label.at("pos", default: default-style.transition.label.pos)
+  let dist = style.label.dist // style.label.at("dist", default: default-style.transition.label.dist)
+  let curve = style.curve // style.at("curve", default: default-style.transition.curve)
 
   let pt = cubic-point(a, b, c, d, pos)
   let n = cubic-normal(a, b, c, d, pos)
