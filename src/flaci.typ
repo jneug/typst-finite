@@ -94,6 +94,10 @@
   return (to-spec(transitions, states: states, inputs: inputs, initial: initial, final: final), layout, style)
 }
 
+
+/// Show a FLACI file as an @cmd:automaton.
+/// @property(see: (<cmd:util:to-spec>))
+/// -> content
 #let automaton(
   data,
   layout: auto,
