@@ -196,15 +196,21 @@
   spec,
   initial: auto,
   final: auto,
-  format: (col, v) => raw(str(v)),
+  format: (col, row, v) => raw(str(v)),
   format-list: states => states.join(", "),
   ..table-style,
 ) = {
   spec = to-spec(spec, initial: initial, final: final)
 
-  let table-cnt = ()
-  for (state, transitions) in spec.transitions {
-    table-cnt.push(format(0, state))
+  let table-cnt = (
+    format(0, 0, ""),
+  )
+  for (col, input) in spec.inputs.enumerate() {
+    table-cnt.push(format(col + 1, 0, input))
+  }
+
+  for (row, (state, transitions)) in spec.transitions.pairs().enumerate() {
+    table-cnt.push(format(0, row + 1, state))
     if util.is-dict(transitions) {
       for (i, char) in spec.inputs.enumerate() {
         let to = ()
@@ -215,10 +221,10 @@
           label = util.def.as-arr(label).map(str)
 
           if char in label {
-            to.push(format(i + 1, name))
+            to.push(name)
           }
         }
-        table-cnt.push(format-list(to))
+        table-cnt.push(if to == () { "" } else { format(i + 1, row + 1, format-list(to)) })
       }
     }
   }
@@ -230,7 +236,6 @@
     },
     align: center + horizon,
     ..table-style,
-    [], ..spec.inputs.map(raw),
     ..table-cnt
   )
 }
