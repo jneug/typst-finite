@@ -1,5 +1,5 @@
 
-#import "@local/mantys:1.0.0": *
+#import "@preview/mantys:1.0.0": *
 
 #import "../src/finite.typ" as finite: cetz
 
@@ -15,13 +15,14 @@
   name,
   read("../src/" + name + ".typ"),
   show-outline: outlined,
+  // scope: scope,
   // include-examples-scope: true,
   // extract-headings: 3,
-  ..tidy-args
+  ..tidy-args,
 )
 
 // Nice display of CeTZ commands
-#show "CETZ": a => package[CeTZ]
+#show "CETZ": _ => package[CeTZ]
 #let cetz-cmd = cmd.with(module: "cetz")
 #let cetz-cmd- = cmd-.with(module: "cetz")
 #let cetz-draw = cmd.with(module: "cetz.draw")
@@ -57,7 +58,7 @@
   abstract: [
     FINITE is a Typst package to draw transition diagrams for finite automata (finite state machines) with the power of CETZ.
 
-    The package provides new elements for manually drawing states and transitions on any CETZ canvas, but also comes with commands to quickly create automata from a transition table.
+    The package provides commands to quickly draw automata from a transition table but also lets you manually create and customize transition diagrams on any CETZ canvas.
   ],
 
   examples-scope: (
@@ -70,6 +71,12 @@
   ),
 
   theme: themes.modern,
+
+  git: git-info(file => read(file)),
+
+  assets: (
+    "assets/example.png": "assets/example.typ",
+  ),
 )
 
 = Usage <sec:usage>
@@ -170,6 +177,26 @@ Most of FINITEs commands expect a finite automaton specification ("spec" in shor
 
 If an automaton has only one final state, the spec can simply be a transition table. In other cases, the specification can explicitly define the various elements.
 
+#custom-type("transition-table", color: rgb("#57a0be"))
+A trnasition table is a #typ.t.dict with state names as keys #typ.t.dict as values. The nested dictionaries have state names as keys and the transition inputs as values.
+
+#codesnippet[```typc
+  (
+    q0: (q1: (0, 1), q2: (0, 1)),
+    q1: (q1: (0, 1), q0: 0, q2: 1),
+    q2: (q0: 0, q1: (1, 0)),
+  )
+  ```]
+
+#schema(
+  "automaton",
+  (
+    finite: bool,
+    type: str,
+  ),
+  color: rgb("#76d6ff"),
+)
+
 
 #custom-type("spec", color: rgb("#76d6ff"))
 A specification (#dtype("spec")) can have these elements:
@@ -242,7 +269,9 @@ The supported styling options (and their defaults) are as follows:
     / #arg(text: ""): Transition label.
     / #arg(size: 1em): Size for label text.
     / #arg(color: auto): Color for label text.
-    / #arg(pos: .5): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the start, #value(1) at the end of the transition.
+    / #arg(
+        pos: .5,
+      ): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the start, #value(1) at the end of the transition.
     / #arg(dist: .33): Distance of the label from the transition.
     / #arg(angle: auto): Angle of the label text. #value(auto) will set the angle based on the transitions direction.
 
@@ -274,6 +303,10 @@ The above commands use custom CETZ elements to draw states and transitions. For 
 
 States and transitions are created in a #cetz-draw[group]. States are drawn with a circle named `state` that can be referenced in the group. Additionally they have a content element named `label` and optionally a line named `initial`. These elements can be referenced inside the group and used as anchors for other CETZ elements. The anchors of `state` are also copied to the state group and are directly accessible.
 
+#info-alert[
+  That means setting #arg(anchor: "west") for a state will anchor the state at the `west` anchor of the states circle, not of the bounding box of the group.
+]
+
 Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content]) element. The anchors of `arrow` are copied to the group.
 
 #example(breakable: true)[```typ
@@ -281,15 +314,17 @@ Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content])
     import cetz.draw: circle, line, content
     import finite.draw: state, transition
 
+    let magenta = rgb("#dc41f1")
+
     state((0, 0), "q0")
-    state((4, 0), "q1", final: true)
+    state((4, 0), "q1", final: true, stroke: magenta)
 
     transition("q0", "q1", label: $epsilon$)
 
     circle("q0.north-west", radius: .4em, stroke: none, fill: black)
 
-    let magenta-stroke = 2pt + rgb("#dc41f1")
-    circle("q0-q1.label.south", radius: .5em, stroke: magenta-stroke)
+    let magenta-stroke = 2pt + magenta
+    circle("q0-q1.label", radius: .5em, stroke: magenta-stroke)
     line(
       name: "q0-arrow",
       (rel: (.6, .6), to: "q1.state.north-east"),
@@ -299,123 +334,131 @@ Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content])
     )
     content(
       (rel: (0, .25), to: "q0-arrow.start"),
-      text(fill: rgb("#dc41f1"), [*very important state*]),
+      text(fill: magenta, [*very important state*]),
     )
   })
   ``` ]
 
 == Layouts <using-layout>
 
-Layouts can be used to move states to new positions within a call to #cetz-cmd-[canvas]. They act #cetz-draw[group]s and have their own transform. Any other elements than states will keep their original coordinates, but be translated by the layout, if necessary.
+#error-alert[
+  Layouts changed in FINITE version 0.5 and are no longer compatible with FINITE 0.4 and before.
+]
 
-FINITE ships with a bunch of layouts, to accomodate different scenarios.
+Layouts can be passed to @cmd:automaton to position states on the canvas without the need to give specific coordinates for each state. FINITE ships with a bunch of layouts, to accomodate different scenarios.
 
 === Available layouts <available-layouts>
-#show-module("layout", sort-functions: false)
+// #show-module("layout", sort-functions: false)
 
 === Using layouts
 
 Layouts are elements themselves. This means, they have a coordinate to be moved on the canvas and they can have anchors. Using layouts allows you to quickly create complex automata, without the need to pick each states coordinate by hand.
-#example(breakable: true)[```typ
-  #cetz.canvas({
-    import cetz.draw: set-style
-    import finite.draw: *
+// #example(breakable: true)[```typ
+//   #cetz.canvas({
+//     import cetz.draw: set-style
+//     import finite.draw: *
 
-    set-style(state: (radius: .4))
+//     set-style(state: (radius: .4))
 
-    layout.grid(
-      name: "grid",
-      (0,0),
-      columns:3, {
-        set-style(state: (fill: green.lighten(80%)))
-        for s in range(6) {
-          state((), "a" + str(s))
-        }
-      })
+//     layout.grid(
+//       name: "grid",
+//       (0,0),
+//       columns:3, {
+//         set-style(state: (fill: green.lighten(80%)))
+//         for s in range(6) {
+//           state((), "a" + str(s))
+//         }
+//       })
 
-    layout.linear(
-      name: "line",
-      (rel:(2,0), to:"grid.east"),
-      dir: bottom, anchor: "center", {
-        set-style(state: (fill: blue.lighten(80%)))
-        for s in range(4) {
-          state((), "b" + str(s))
-        }
-      })
+//     layout.linear(
+//       name: "line",
+//       (rel:(2,0), to:"grid.east"),
+//       dir: bottom, anchor: "center", {
+//         set-style(state: (fill: blue.lighten(80%)))
+//         for s in range(4) {
+//           state((), "b" + str(s))
+//         }
+//       })
 
-    state((rel: (0, -1.4), to:"grid.south"), "TRAP", fill:red.lighten(80%), label:(size:8pt))
+//     state((rel: (0, -1.4), to:"grid.south"), "TRAP", fill:red.lighten(80%), label:(size:8pt))
 
-    transition("grid.a0", "TRAP", curve:-1)
-    transition("line.b2", "TRAP")
-    transition("grid.a5", "line.b0")
-    transition("grid.a5", "line.b2", curve:-.2)
-  })
-  ```]
+//     transition("grid.a0", "TRAP", curve:-1)
+//     transition("line.b2", "TRAP")
+//     transition("grid.a5", "line.b0")
+//     transition("grid.a5", "line.b2", curve:-.2)
+//   })
+//   ```]
 
 
 == Utility functions
 #show-module("util", outlined: true)
 
-== Doing other stuff with FINITE
+= Simulating input
 
-Since transition diagrams are effectively graphs, FINITE could also be used to draw graph structures:
-#example[```
-  #cetz.canvas({
-    import cetz.draw: set-style
-    import finite.draw: state, transitions
+FINITE has a set of
 
-    state((0,0), "A")
-    state((3,1), "B")
-    state((4,-2), "C")
-    state((1,-3), "D")
-    state((6,1), "E")
+= Working with grammars
 
-    transitions((
-        A: (B: 1.2),
-        B: (C: .5, E: 2.3),
-        C: (B: .8, D: 1.4, E: 4.5),
-        D: (A: 1.8),
-        E: (:)
-      ),
-      C-E: (curve: -1.2))
-  })
-  ```]
+// == Doing other stuff with FINITE
 
-= Showcase <sec:showcase>
+// Since transition diagrams are effectively graphs, FINITE could also be used to draw graph structures:
+// #example[```
+//   #cetz.canvas({
+//     import cetz.draw: set-style
+//     import finite.draw: state, transitions
 
-#example[```typ
-  #scale(80%, automaton((
-      q0: (q1: 0, q2: 0),
-      q2: (q3: 1, q4: 0),
-      q4: (q2: 0, q5: 0, q6: 0),
-      q6: (q7: 1),
-      q1: (q3: 1, q4: 0),
-      q3: (q1: 1, q5: 1, q6: 1),
-      q5: (q7: 1),
-      q7: ()
-    ),
-    layout: finite.layout.group.with(grouping: (
-        ("q0",),
-        ("q1", "q2", "q3", "q4", "q5", "q6"),
-        ("q7",)
-      ),
-      spacing: 2,
-      layout: (
-        finite.layout.linear,
-        finite.layout.grid.with(columns:3, spacing:2.6),
-        finite.layout.linear
-      )
-    ),
-    style: (
-      transition: (curve: 0),
-      q1-q3: (curve:1),
-      q3-q1: (curve:1),
-      q2-q4: (curve:1),
-      q4-q2: (curve:1),
-      q1-q4: (label: (pos:.75)),
-      q2-q3: (label: (pos:.75, dist:-.33)),
-      q3-q6: (label: (pos:.75)),
-      q4-q5: (label: (pos:.75, dist:-.33))
-    )
-  ))
-  ```]
+//     state((0,0), "A")
+//     state((3,1), "B")
+//     state((4,-2), "C")
+//     state((1,-3), "D")
+//     state((6,1), "E")
+
+//     transitions((
+//         A: (B: 1.2),
+//         B: (C: .5, E: 2.3),
+//         C: (B: .8, D: 1.4, E: 4.5),
+//         D: (A: 1.8),
+//         E: (:)
+//       ),
+//       C-E: (curve: -1.2))
+//   })
+//   ```]
+
+// = Showcase <sec:showcase>
+
+// #example[```typ
+//   #scale(80%, automaton((
+//       q0: (q1: 0, q2: 0),
+//       q2: (q3: 1, q4: 0),
+//       q4: (q2: 0, q5: 0, q6: 0),
+//       q6: (q7: 1),
+//       q1: (q3: 1, q4: 0),
+//       q3: (q1: 1, q5: 1, q6: 1),
+//       q5: (q7: 1),
+//       q7: ()
+//     ),
+//     layout: finite.layout.group.with(grouping: (
+//         ("q0",),
+//         ("q1", "q2", "q3", "q4", "q5", "q6"),
+//         ("q7",)
+//       ),
+//       spacing: 2,
+//       layout: (
+//         finite.layout.linear,
+//         finite.layout.grid.with(columns:3, spacing:2.6),
+//         finite.layout.linear
+//       )
+//     ),
+//     style: (
+//       transition: (curve: 0),
+//       q1-q3: (curve:1),
+//       q3-q1: (curve:1),
+//       q2-q4: (curve:1),
+//       q4-q2: (curve:1),
+//       q1-q4: (label: (pos:.75)),
+//       q2-q3: (label: (pos:.75, dist:-.33)),
+//       q3-q6: (label: (pos:.75)),
+//       q4-q5: (label: (pos:.75, dist:-.33))
+//     )
+//   ))
+//   ```]
