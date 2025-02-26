@@ -5,5 +5,4 @@
 
 #import "./cmd.typ": create-automaton, automaton, transition-table, powerset, add-trap, accepts
 
-#import "./grammar.typ"
 #import "./flaci.typ"

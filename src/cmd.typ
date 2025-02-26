@@ -1,7 +1,7 @@
 #import "./draw.typ"
 
 #import "./layout.typ" as _layout
-#import "./util.typ" as util: to-spec, to-grammar, cetz
+#import "./util.typ" as util: to-spec, cetz
 
 
 /// Creates a full @type:automaton specification for a finite automaton.
