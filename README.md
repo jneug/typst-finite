@@ -22,7 +22,7 @@ After importing the package, simply call `#automaton()` with a dictionary holdin
 ```
 
 The output should look like this:
-![Example for a finite automaton drawn with finite](assets/example.png)
+![Example for a finite automaton drawn with finite](docs/assets/example.png)
 
 ## Further documentation
 
