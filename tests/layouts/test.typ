@@ -9,7 +9,7 @@
     d
   },
 )
-#let spec = finite.util.to-spec(aut)
+#let spec = finite.to-spec(aut)
 
 === layout.custom
 #finite.automaton(

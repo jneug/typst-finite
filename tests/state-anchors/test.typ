@@ -5,7 +5,7 @@
 #finite.cetz.canvas({
   import finite.cetz.draw: *
   import finite.draw: *
-  import finite.util: dot
+  import "../test-utils.typ": dot
 
   let name = "q0"
   let anchor = "west"
@@ -28,7 +28,7 @@
 #finite.cetz.canvas({
   import finite.cetz.draw: *
   import finite.draw: *
-  import finite.util: dot
+  import "../test-utils.typ": dot
 
   let name = "q0"
   let anchor = "west"
