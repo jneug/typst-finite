@@ -1,7 +1,118 @@
 #import "./draw.typ"
-#import "./layout.typ"
-#let _layout = layout
-#import "./util.typ" as util: to-spec, cetz
+
+#import "./layout.typ" as _layout
+#import "./util.typ" as util: to-spec, to-grammar, cetz
+
+
+/// Creates a full @type:automaton specification for a finite automaton.
+/// The function accepts either a partial specification and
+/// adds the missing keys by parsing the available information
+/// or takes a @type:transition-table and parses it into a full specification.
+///
+/// ```example
+/// #finite.create-automaton((
+///   q0: (q1: 0, q0: (0,1)),
+///   q1: (q0: (0,1), q2: "0"),
+///   q2: none,
+/// ))
+/// ```
+///
+/// If any of the keyword arguments are set, they will
+/// overwrite the information in #arg[spec].
+///
+/// -> automaton
+#let create-automaton(
+  spec,
+  states: auto,
+  initial: auto,
+  final: auto,
+  inputs: auto,
+) = {
+  // TODO: (jneug) add asserts to react to malicious specs
+  util.assert.any-type(dictionary, spec)
+
+  // TODO: (jneug) check for duplicate names
+  if "transitions" not in spec {
+    spec = (transitions: spec)
+  }
+
+  // Make sure transition inputs are string arrays
+  for (state, trans) in spec.transitions {
+    if util.is-none(trans) {
+      trans = (:)
+    }
+    for (s, inputs) in trans {
+      if type(inputs) != array {
+        trans.at(s) = (str(inputs),)
+      } else {
+        trans.at(s) = inputs.map(str)
+      }
+    }
+    spec.transitions.at(state) = trans
+  }
+
+  // TODO (jneug) validate given states with transitions
+  if "states" not in spec {
+    spec.insert(
+      "states",
+      util.def.if-auto(
+        states,
+        def: spec
+          .transitions
+          .pairs()
+          .fold(
+            (),
+            (
+              a,
+              (s, t),
+            ) => {
+              a.push(s)
+              return a + t.keys()
+            },
+          )
+          .dedup(),
+      ),
+    )
+  }
+
+
+  if "initial" not in spec {
+    spec.insert(
+      "initial",
+      util.def.if-auto(
+        initial,
+        def: spec.states.first(),
+      ),
+    )
+  }
+
+  // Insert final state
+  if "final" not in spec {
+    if util.is-auto(final) {
+      final = (spec.states.last(),)
+    } else if is-none(final) {
+      final = ()
+    }
+    spec.insert("final", final)
+  }
+
+  if "inputs" not in spec {
+    if util.is-auto(inputs) {
+      inputs = util.get-inputs(spec.transitions)
+    }
+    spec.insert("inputs", inputs)
+  } else {
+    spec.inputs = spec.inputs.map(str).sorted()
+  }
+
+  if util.is-dea(spec.transitions) {
+    spec.insert("type", "DEA")
+  } else {
+    spec.insert("type", "NEA")
+  }
+
+  return spec + (finite-spec: true)
+}
 
 
 /// Draw an automaton from a specification.
@@ -80,7 +191,7 @@
     }
   },
   input-format: inputs => inputs.map(str).join(","),
-  layout: layout.linear,
+  layout: _layout.linear,
   ..canvas-styles,
 ) = {
   spec = to-spec(spec, initial: initial, final: final)
@@ -360,6 +471,7 @@
         },
       ),
     )
+    spec.states.push(trap-name)
   }
 
   spec.at("transitions") = util.transpose-table(table)
@@ -390,9 +502,11 @@
 #let accepts(
   spec,
   word,
-  format: states => states.map(((s, i)) => if i != none [
-    #s #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, raw(i))]]
-  ] else [#s]).join(),
+  format: (spec, states) => states
+    .map(((s, i)) => if i != none [
+      #s #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, raw(i))]]
+    ] else [#s])
+    .join(),
 ) = {
   spec = to-spec(spec)
 
@@ -403,17 +517,25 @@
   )
   transitions = util.transpose-table(transitions)
 
-  util.assert.not-empty(transitions)
-  util.assert.not-empty(initial)
-  util.assert.not-empty(final)
+  util.assert.that(transitions != (:))
+  util.assert.that(initial != none)
+  util.assert.that(final != ())
 
+  let next-symbol(word, inputs) = {
+    for sym in inputs {
+      if word.starts-with(sym) {
+        return (word.slice(sym.len()), sym)
+      }
+    }
+    return (word, none)
+  }
   let traverse(word, state) = {
     if word.len() > 0 {
-      let symbol = word.at(0)
+      let (word, symbol) = next-symbol(word, spec.inputs)
       if state in transitions {
-        if symbol in transitions.at(state) {
+        if symbol != none and symbol in transitions.at(state) {
           for next-state in transitions.at(state).at(symbol) {
-            let states = traverse(word.slice(1), next-state)
+            let states = traverse(word, next-state)
             if states != false {
               return ((state, symbol),) + states
             }
@@ -434,6 +556,6 @@
   if result == false {
     return false
   } else {
-    return format(result)
+    return format(spec, result)
   }
 }
