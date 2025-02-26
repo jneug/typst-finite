@@ -308,8 +308,13 @@
   }
 }
 
-// Changes a transition table from the format (`state`: `inputs`) to (`input`: `states`) or vice versa.
-#let transpose-table(table) = {
+/// Changes a @type:transition-table from the format (`state`: `inputs`) to (`input`: `states`) or vice versa.
+/// -> dict
+#let transpose-table(
+  /// A transition table in any format.
+  /// -> transition-table
+  table,
+) = {
   let ttable = (:)
   for (key, values) in table {
     let new-values = (:)
@@ -336,7 +341,15 @@
 }
 
 /// Gets a list of all inputs from a transition table.
-#let get-inputs(table, transpose: true) = {
+///
+#let get-inputs(
+  /// A transition table.
+  /// -> transition-table
+  table,
+  /// If #arg[table] needs to be transposed first. Set this to #typ.v.false if the table already is in the format (`input`: `states`).
+  /// -> bool
+  transpose: true,
+) = {
   if transpose {
     table = transpose-table(table)
   }
@@ -355,8 +368,8 @@
 
 /// Creates a full specification for a finite automaton.
 #let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
-  // TODO: (ngb) add asserts to react to malicious specs
-  // TODO: (ngb) check for duplicate names
+  // TODO: (jneug) add asserts to react to malicious specs
+  // TODO: (jneug) check for duplicate names
   if "transitions" not in spec {
     spec = (transitions: spec)
   }
@@ -475,13 +488,15 @@
 }
 
 #let get-radii(elements) = {
-  return elements.filter(is-state).fold(
-    (:),
-    (radii, element) => {
-      radii.insert(element.name, element.finite.radius)
-      return radii
-    },
-  )
+  return elements
+    .filter(is-state)
+    .fold(
+      (:),
+      (radii, element) => {
+        radii.insert(element.name, element.finite.radius)
+        return radii
+      },
+    )
 }
 
 // Resolve radii for states by applying styles from other elements.
@@ -519,12 +534,12 @@
           default: style.at(
             "state",
             default: (:),
-          )
+          ),
         )
         .at(
-        "radius",
-        default: default-style.state.radius,
-      ),
+          "radius",
+          default: default-style.state.radius,
+        ),
     )
     d
   },
