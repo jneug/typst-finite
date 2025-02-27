@@ -5,15 +5,14 @@
 #let automatons = (
   "DEA-1",
   "DEA-2",
-  "DEA-3",
+  "DEA-3", // With BOM
   "NEA-1",
-  // "NKA-1",
+  // "NKA-1",  // Not yet supported
 )
 
 #for file in automatons {
   page[
-    #let aut = json(file + ".json")
+    #let aut = read(file + ".json")
     #flaci.automaton(aut, style: (q1: (fill: green)))
   ]
 }
-
