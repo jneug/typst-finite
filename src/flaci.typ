@@ -1,8 +1,21 @@
 #import "./cmd.typ"
 #import "./util.typ": get, to-spec, vec-to-align, align-to-vec
 
+#let _bom = bytes((239, 187, 191))
+#let _load-json(data) = {
+  data = bytes(data)
+  if data.slice(0, 3) == _bom {
+    data = data.slice(3)
+  }
+  return json(data)
+}
+
 #let load(data) = {
-  assert(data.at("type", default: "ERROR") in ("DEA", "NEA"))
+  data = _load-json(data)
+  assert(
+    data.at("type", default: "ERROR") in ("DEA", "NEA"),
+    message: "Currently only FLACI automata of type DEA or NEA are supported. Got: " + data.at("type", default: "none"),
+  )
   let automaton = data.at("automaton", default: (:))
 
   // Scaling factor for FLACI coordinates to CeTZ conversion
@@ -96,6 +109,17 @@
 
 
 /// Show a FLACI file as an @cmd:automaton.
+///
+/// #alert-warning[
+///   Read the FLACI json-file with the #typ.read function, not
+///   the #typ.json function. FLACI exports automatons with a wrong encoding
+///   that prevents Typst from properly loading the file as JSON.
+/// ]
+///
+/// #alert-info[
+///   Currently only DEA and NEA automata are supported.
+/// ]
+///
 /// @property(see: (<cmd:util:to-spec>))
 /// -> content
 #let automaton(
