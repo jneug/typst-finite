@@ -27,11 +27,11 @@ VERSION="$(read-toml "$ROOT/typst.toml" "version")"
 function resolve-target() {
   local target="$1"
 
-	if [[ "$target" == "@local" ]]; then
-		echo "${DATA_DIR}/typst/packages/local"
-	elif [[ "$target" == "@preview" ]]; then
-		echo "${DATA_DIR}/typst/packages/preview"
-	else
-		echo "$target"
-	fi
+  if [[ "$target" == "@local" ]]; then
+    echo "${DATA_DIR}/typst/packages/local"
+  elif [[ "$target" == "@preview" ]]; then
+    echo "${DATA_DIR}/typst/packages/preview"
+  else
+    echo "$target"
+  fi
 }

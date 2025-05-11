@@ -1,26 +1,32 @@
 root := justfile_directory()
-
 export TYPST_ROOT := root
+package-fork := "$TYPST_PKG_FORK"
 
 [private]
 default:
-	@just --list --unsorted
+    @just --list --unsorted
+
+# build assets
+assets:
+    typst compile docs/assets/example.typ docs/assets/example.png
+    typst compile docs/assets/example.typ thumbnail-light.svg
+    typst compile --input theme=dark docs/assets/example.typ thumbnail-dark.svg
 
 # generate manual
-doc:
-	typst compile docs/manual.typ docs/manual.pdf
+doc: assets
+    typst compile docs/manual.typ docs/manual.pdf
 
 # run test suite
 test *args:
-	typst-test run {{ args }}
+    tt run {{ args }}
 
 # update test cases
 update *args:
-	typst-test update {{ args }}
+    tt update {{ args }}
 
 # package the library into the specified destination folder
 package target:
-  ./scripts/package "{{target}}"
+    ./scripts/package "{{ target }}"
 
 # install the library with the "@local" prefix
 install: (package "@local")
@@ -28,15 +34,29 @@ install: (package "@local")
 # install the library with the "@preview" prefix (for pre-release testing)
 install-preview: (package "@preview")
 
+prepare: (package package-fork)
+
+# create a symbolic link to this library in the target repository
+link target="@local":
+    ./scripts/link "{{ target }}"
+
+link-preview: (link "@preview")
+
 [private]
 remove target:
-  ./scripts/uninstall "{{target}}"
+    ./scripts/uninstall "{{ target }}"
 
 # uninstalls the library from the "@local" prefix
 uninstall: (remove "@local")
 
 # uninstalls the library from the "@preview" prefix (for pre-release testing)
 uninstall-preview: (remove "@preview")
+
+# unlinks the library from the "@local" prefix
+unlink: (remove "@local")
+
+# unlinks the library from the "@preview" prefix
+unlink-preview: (remove "@preview")
 
 # run ci suite
 ci: test doc
