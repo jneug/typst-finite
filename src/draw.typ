@@ -197,7 +197,7 @@
   // No extra positional arguments from the style sink
   util.assert.no-pos(style)
 
-  // TODO: (jneug) allow labelsl with math or content
+  // TODO: (jneug) allow labels with math or content
 
   // Name of two states required
   util.assert.all-of-type(str, from, to)

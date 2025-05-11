@@ -290,7 +290,7 @@
 ///     q0: (q1: 0, q0: (1,0)),
 ///     q1: (q0: 1, q2: (1,0)),
 ///     q2: (q0: 1, q2: 0),
-///   ), format: (col, value) => if col == 1 { strong(value) } else [#value])
+///   ), format: (col, row, value) => if col == 1 { strong(value) } else [#value])
 ///   ```]
 /// - format-list (function): Formats a list of states for display in a table cell. The function takes an array of state names and generates a string to be passed to #arg[format]:
 /// #lambda("array", ret:"string")
