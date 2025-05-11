@@ -191,12 +191,15 @@
   for name in spec.states {
     let radius = radii.at(name)
     let ang = 0deg
-    let ang = offset + util.math.map(
-      0.0,
-      len,
-      0deg,
-      360deg,
-      at + radius,
+    let ang = (
+      offset
+        + util.math.map(
+          0.0,
+          len,
+          0deg,
+          360deg,
+          at + radius,
+        )
     )
 
     let pos = (
@@ -206,7 +209,8 @@
           radius
         } else {
           -radius
-        } * calc.sin(ang),
+        }
+          * calc.sin(ang),
       ),
       to: position,
     )
