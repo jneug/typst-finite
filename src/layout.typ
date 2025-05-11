@@ -89,7 +89,7 @@
   assert-spec(spec)
 
   let dir = dir
-  if test.any-type("alignment", "2d alignment", dir) {
+  if test.is-type(alignment, dir) {
     dir = util.align-to-vec(dir)
   }
   dir = cetz.vector.norm(dir)

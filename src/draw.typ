@@ -200,7 +200,7 @@
   // TODO: (jneug) allow labelsl with math or content
 
   // Name of two states required
-  util.assert.all-of-type("string", from, to)
+  util.assert.all-of-type(str, from, to)
   let name = from.split(".").last() + "-" + to.split(".").last()
 
   cetz.draw.group(
@@ -303,7 +303,7 @@
         cetz.draw.content(
           name: "label",
           label-pt,
-          angle: if type(style.label.angle) == angle {
+          angle: if util.is-angle(style.label.angle) {
             style.label.angle
           } else if start == end {
             0deg
