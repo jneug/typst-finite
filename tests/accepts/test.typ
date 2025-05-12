@@ -2,7 +2,7 @@
 
 #set page(width: auto, height: auto, margin: 1cm)
 
-#let aut = finite.to-spec((
+#let aut = finite.create-automaton((
   q0: (q1: "a"),
   q1: (q1: ("a", "b"), q2: "c"),
   q2: (q0: "b"),
@@ -31,7 +31,7 @@
 
 #pagebreak()
 
-#let aut = finite.to-spec((
+#let aut = finite.create-automaton((
   q0: (q1: "la"),
   q1: (q1: ("la", "le"), q2: "lu"),
   q2: (q0: "lu"),
@@ -45,7 +45,7 @@
 
 #pagebreak()
 
-#let aut = finite.to-spec((
+#let aut = finite.create-automaton((
   q0: (q1: "la"),
   q1: (q1: (1, "x"), q2: "foo"),
   q2: (q0: 0),
