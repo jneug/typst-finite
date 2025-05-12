@@ -2,7 +2,7 @@
 github_url = "https://github.com/jneug/typst-finite/"
 
 [version]
-current = "0.4.1"
+current = "0.5.0"
 
 # Example of a semver regexp.
 # Make sure this matches current_version before
@@ -19,9 +19,9 @@ regex = '''
 message_template = "Bump to {new_version}"
 tag_template = "v{new_version}"
 
-# [[file]]
-# src = "typst.toml"
-# search = 'version = "{current_version}"'
+[[file]]
+src = "typst.toml"
+search = 'version = "{current_version}"'
 
 [[file]]
 src = "README.md"
