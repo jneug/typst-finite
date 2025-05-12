@@ -4,37 +4,46 @@
 
 /// Helper function to create a layout dictionary by providing
 /// #arg[positions] and/or #arg[anchors].
+/// -> array
 #let create-layout(positions: (:), anchors: (:)) = {
   (positions, anchors)
 }
 
 
-/// Create a custom layout from a #dtype("dictionary") with
-/// state coordinates.
+/// Create a custom layout from a #typ.t.dictionary with
+/// state #dtype("coordinate")s.
+///
+/// The result may specify a `rest` key that is used as a default coordinate. This is useful
+/// sense in combination with a relative coordinate like `(rel:(2,0))`.
 ///
 /// #example(breakable:true)[```
 /// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), none); d})
 /// #finite.automaton(
 ///   aut,
 ///   initial: none, final: none,
-///   layout:finite.layout.custom.with(positions:(..) => (
-///     q0: (0,0), q1: (0,5), rest:(rel: (2,-1))
+///   layout:finite.layout.custom.with(positions: (
+///     q0: (0,0), q1: (0,2), rest:(rel: (1.5,-.5))
 ///   ))
 /// )
 /// ```]
 ///
-/// - position (coordinate): Position of the anchor point.
-/// - positions (function): A function #lambda("dictionary","dictionary","array",ret:"dictionary") to compute coordinates for each state.\
-///    The function gets the current CETZ context, a dictionary of computed radii for each
-///    state and a list with all state elements to position. The returned dictionary
-///    contains each states name as a key and the new coordinate as a value.
-///
-///    The result may specify a `rest` key that is used as a default coordinate. This makes
-///    sense in combination with a relative coordinate like `(rel:(2,0))`.
+/// -> array
 #let custom(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// A dictionary with #dtype("coordinate")s for each state.
+  ///
+  /// The dictionary contains each states name as a
+  /// key and the new coordinate as a value.
+  ///
+  /// -> dictionary
   positions: (:),
+  /// Position of the anchor point.
+  /// -> coordinate
   position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   assert-spec(spec)
@@ -59,8 +68,8 @@
 
 /// Arrange states in a line.
 ///
-/// The direction of the line can be set via #arg[dir] either to an #dtype("alignment")
-/// or a `vector` with a x and y shift.
+/// The direction of the line can be set via #arg[dir] either to an #typ.t.alignment
+/// or a direction vector with a x and y shift. Note that the length of the vector is set to #arg[spacing] and only the direction is used.
 ///
 /// #example(breakable:true)[```
 /// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), none); d})
@@ -72,18 +81,26 @@
 /// #finite.automaton(
 ///   aut,
 ///   initial: none, final: none,
-///   layout:finite.layout.linear.with(dir:(.5, -.2))
+///   layout:finite.layout.linear.with(spacing: .5, dir:(2,-1))
 /// )
 /// ```]
 ///
-/// - position (coordinate): Position of the anchor point.
-/// - dir (vector,alignment,2d alignment): Direction of the line.
-/// - spacing (float): Spacing between states on the line.
+/// -> array
 #let linear(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// Direction of the line.
+  /// -> vector | alignment | 2d alignment
   dir: right,
+  /// Spacing between states on the line.
+  /// -> float
   spacing: default-style.state.radius * 2,
+  /// Position of the anchor point.
+  /// -> coordinate
   position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   assert-spec(spec)
@@ -159,19 +176,27 @@
 ///   )
 /// )
 /// ```]
-///
-/// - position (coordinate): Position of the anchor point.
-/// - dir (alignment): Direction of the circle. Either #value(left) or #value(right).
-/// - spacing (float): Spacing between states on the line.
-/// - radius (float,auto): Either a fixed radius or #value(auto) to calculate a suitable the radius.
-/// - offset (angle): An offset angle to place the first state at.
 #let circular(
+  /// Automaton specification.
+  /// -> spec
   spec,
-  position: (0, 0),
+  /// Direction of the circle. Either #value(left) or #value(right).
+  /// -> alignment
   dir: right,
-  spacing: .6,
+  /// Spacing between states on the line.
+  /// -> float
+  spacing: default-style.state.radius * 2,
+  /// Either a fixed radius or #typ.v.auto to calculate a suitable radius.
+  /// -> float | auto
   radius: auto,
+  /// An offset angle to place the first state at.
+  /// -> angle
   offset: 0deg,
+  /// Position of the anchor point.
+  /// -> coordinate
+  position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   // TODO: (jneug) fix positioning
@@ -187,9 +212,9 @@
 
   let positions = (:)
   let anchors = (:)
-  let at = none
+  let at = 0.0
   for name in spec.states {
-    let radius = radii.at(name)
+    let state-radius = radii.at(name)
     let ang = 0deg
     let ang = (
       offset
@@ -198,7 +223,7 @@
           len,
           0deg,
           360deg,
-          at + radius,
+          at + state-radius,
         )
     )
 
@@ -219,7 +244,7 @@
 
     // anchors.insert(name, "state." + repr(-ang))
 
-    at += 2 * radius + spacing
+    at += 2 * state-radius + spacing
   }
   return create-layout(positions: positions, anchors: anchors)
 }
@@ -236,14 +261,22 @@
 /// )
 /// ```]
 ///
-/// - position (coordinate): Position of the anchor point.
-/// - columns (integer): Number of columns per row.
-/// - spacing (float): Spacing between states on the grid.
+/// -> array
 #let grid(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// Number of columns per row.
+  /// -> int
   columns: 4,
-  spacing: .6,
+  /// Spacing between states on the grid.
+  /// -> float
+  spacing: default-style.state.radius * 2,
+  /// Position of the anchor point.
+  /// -> coordinate
   position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   let spacing = if not util.is-arr(spacing) {
@@ -287,14 +320,22 @@
 /// )
 /// ```]
 ///
-/// - position (coordinate): Position of the anchor point.
-/// - columns (integer): Number of columns per row.
-/// - spacing (float): Spacing between states on the line.
+/// -> array
 #let snake(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// Number of columns per row.
+  /// -> int
   columns: 4,
-  spacing: .6,
+  /// Spacing between states on the line.
+  /// -> float
+  spacing: default-style.state.radius * 2,
+  /// Position of the anchor point.
+  /// -> coordinate
   position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   let spacing = if not util.is-arr(spacing) {
@@ -340,21 +381,46 @@
 /// Creates a group layout that collects states into groups that are
 /// positioned by specific sub-layouts.
 ///
-/// See @sec:showcase for an example.
+/// #example(breakable:true)[```
+/// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), none); d})
+/// #finite.automaton(
+///   aut,
+///   initial: none, final: none,
+///   layout: finite.layout.group.with(
+///     grouping: 3,
+///     spacing: 4,
+///     layout: (
+///       finite.layout.linear.with(dir: bottom),
+///       finite.layout.circular,
+///     )
+///   )
+/// )
+/// ```]
 ///
-/// - position (coordinate): Position of the anchor point.
-/// - grouping (int, array): Either an integer to collect states into
-///     roughly equal sized groups or an array of arrays that specify which states
-///     (by name) are in what group.
-/// - spacing (float): A spacing between sub-group layouts.
-/// - layout (array): An array of layouts to use for each group. The first group of
-///     states will be passed to the first layout and so on.
+/// See @sec:showcase for a more comprehensive example.
+///
+/// -> array
 #let group(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// Either an integer to collect states into
+  /// roughly equal sized groups or an array of arrays that specify which
+  /// states (by name) are in each group.
+  /// -> int | array
   grouping: auto,
-  spacing: .8,
+  /// Spacing between states on the line.
+  /// -> float
+  spacing: default-style.state.radius * 2,
+  /// An array of layouts to use for each group. The first group of
+  /// states will be passed to the first layout and so on.
+  /// -> array
   layout: linear.with(dir: bottom),
+  /// Position of the anchor point.
+  /// -> coordinate
   position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
   style: (:),
 ) = {
   assert-spec(spec)

@@ -1,7 +1,8 @@
 #import "./cmd.typ"
-#import "./util.typ": get, to-spec, vec-to-align, align-to-vec
+#import "./util.typ": get, vec-to-align, align-to-vec
 
 #let _bom = bytes((239, 187, 191))
+// Parse a string with BOM into a JSON dictionary.
 #let _load-json(data) = {
   data = bytes(data)
   if data.slice(0, 3) == _bom {
@@ -10,7 +11,14 @@
   return json(data)
 }
 
-#let load(data) = {
+/// Loads #arg[data] into an automaton @type:spec.
+/// #arg[data] needs to be a string and not a JSON dictionary.
+/// -> spec
+#let load(
+  /// FLACI data read as a string via #typ.read.
+  /// -> str
+  data,
+) = {
   data = _load-json(data)
   assert(
     data.at("type", default: "ERROR") in ("DEA", "NEA"),
@@ -104,30 +112,45 @@
   }
 
 
-  return (to-spec(transitions, states: states, inputs: inputs, initial: initial, final: final), layout, style)
+  return (
+    cmd.create-automaton(transitions, states: states, inputs: inputs, initial: initial, final: final),
+    layout,
+    style,
+  )
 }
 
 
 /// Show a FLACI file as an @cmd:automaton.
 ///
-/// #alert-warning[
+/// #warning-alert[
 ///   Read the FLACI json-file with the #typ.read function, not
 ///   the #typ.json function. FLACI exports automatons with a wrong encoding
 ///   that prevents Typst from properly loading the file as JSON.
 /// ]
 ///
-/// #alert-info[
+/// #info-alert[
 ///   Currently only DEA and NEA automata are supported.
 /// ]
-///
-/// @property(see: (<cmd:util:to-spec>))
 /// -> content
 #let automaton(
+  /// FLACI data read as a string via #typ.read.
+  /// -> str
   data,
+  /// Custom layout for the automaton. Will overwrite state positions from #arg[data].
+  /// -> function
   layout: auto,
+  /// Custom state positions to merge with the ones found in #arg[data].
+  /// This allows the placement of some states while the
+  /// rest keeps their positions.
+  /// -> dictionary
   merge-layout: true,
+  /// Custom styles to overwrite the defaults.
+  /// -> dictionary
   style: auto,
+  /// Custom styles to merge with the styles from #arg[data].
   merge-style: true,
+  /// Further arguments for @cmd:automaton.
+  /// -> any
   ..args,
 ) = {
   let (spec, lay, sty) = load(data)

@@ -13,31 +13,38 @@
 /// })
 /// ```]
 ///
-/// - position (coordinate): Position of the states center.
-/// - name (string): Name for the state.
-/// - label (string,content,auto,none): Label for the state. If set to #value(auto), the #arg[name] is used.
-/// - initial (boolean,alignment,dictionary): Whether this is an initial state. This can be either
-///   - #value(true),
-///   - an #dtype("alignment") to specify an anchor for the inital marking,
-///   - a #dtype("string") to specify text for the initial marking,
-///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking. Additionally, the keys `stroke` and `scale` can be used to style the marking.
-/// - final (boolean): Whether this is a final state.
-/// - anchor (string): Anchor to use for drawing.
-/// - ..style (any): Styling options.
+/// -> array
 #let state(
+  /// Position of the states center.
+  /// -> coordinate
   position,
+  /// Name for the state.
+  /// -> str
   name,
+  /// Label for the state. If set to #value(auto), the #arg[name] is used.
+  /// -> str | content | auto | none
   label: auto,
+  /// Whether this is an initial state. This can be either
+  ///   - #value(true),
+  ///   - an #dtype("alignment") to specify an anchor for the inital marking,
+  ///   - a #dtype("string") to specify text for the initial marking,
+  ///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking. Additionally, the keys `stroke` and `scale` can be used to style the marking.
+  /// -> boolean | alignment | dictionary
   initial: false,
+  /// Whether this is a final state.
+  /// -> boolean
   final: false,
+  /// Anchor to use for drawing.
+  /// -> str
   anchor: none,
+  /// Styling options.
+  /// -> any
   ..style,
 ) = {
   // No extra positional arguments from the style sink
   util.assert.no-pos(style)
 
   // Create element function
-  // TODO: (jneug) remove wrapper
   cetz.draw.group(
     name: name,
     anchor: anchor,
@@ -176,22 +183,29 @@
 /// })
 /// ```]
 ///
-/// - from (string): Name of the starting state.
-/// - to (string): Name of the ending state.
-/// - inputs (string,array,none): A list of input symbols for the transition.
-///    If provided as a #dtype("string"), it is split on commas to get the list of
-///    input symbols.
-/// - label (string,content,auto,dictionary): A label for the transition. For #value(auto)
-///    the #arg[input] symbols are joined with commas. Can be a #dtype("dictionary") with
-///    a `text` and additional styling keys.
-/// - anchor (alignment): Anchor for loops. Has no effect on normal transitions.
-/// - ..style (any): Styling options.
+/// -> array
 #let transition(
+  /// Name of the starting state.
+  /// -> str
   from,
+  /// Name of the ending state.
+  /// -> str
   to,
+  /// A list of input symbols for the transition.
+  /// If provided as a #typ.t.str, it is split at commas to get the list of
+  /// input symbols.
+  /// -> str | array | none
   inputs: none,
+  /// A label for the transition. For #typ.v.auto
+  /// the #arg[input] symbols are joined with commas (`,`). Can be a #typ.t.dictionary with
+  /// a `text` key and additional styling keys.
+  /// -> str | content | auto | dictionary
   label: auto,
+  /// Anchor for loops. Has no effect on normal transitions.
+  /// -> alignment
   anchor: top,
+  ///Styling options.
+  /// -> any
   ..style,
 ) = {
   // No extra positional arguments from the style sink
@@ -340,10 +354,38 @@
 
 
 /// Create a transition loop on a state.
+/// #example[```
+/// #cetz.canvas({
+///   import finite.draw: state, loop
+///   state((0,0), "q1")
+///   loop("q1", label:"a")
+///   loop("q1", anchor: bottom+right, label:"b")
+/// })
+/// ```]
 ///
 /// This is a shortcut for @cmd:transition that takes only one
 /// state name instead of two.
-#let loop(state, inputs: none, label: auto, anchor: top, ..style) = transition(
+#let loop(
+  /// Name of the state to draw the loop on.
+  /// -> str
+  state,
+  /// A list of input symbols for the loop.
+  /// If provided as a #typ.t.str, it is split at commas to get the list of
+  /// input symbols.
+  /// -> str | array | none
+  inputs: none,
+  /// A label for the loop. For #typ.v.auto
+  /// the #arg[input] symbols are joined with commas (`,`). Can be a #typ.t.dictionary with
+  /// a `text` key and additional styling keys.
+  /// -> str | content | auto | dictionary
+  label: auto,
+  /// Anchor for the loop.
+  /// -> alignment
+  anchor: top,
+  ///Styling options.
+  /// -> any
+  ..style,
+) = transition(
   state,
   state,
   inputs: inputs,
@@ -353,11 +395,31 @@
 )
 
 
-/// Draws all transitions from a transition table with a common style.
+/// Draws multiple transitions from a transition table with a common style.
+/// #example[```
+/// #cetz.canvas({
+///   import finite.draw: state, transitions
+///   state((0,0), "q1")
+///   state((2,0), "q2")
+///   transitions(
+///     (
+///       q1: (q2: (0, 1)),
+///       q2: (q1: 0, q2: 1)
+///     ),
+///     transition: (stroke: green)
+///   )
+/// })
+/// ```]
 ///
-/// - states (dictionary): A transition table given as a dictionary of dictionaries.
-/// - ..style (any): Styling options.
-#let transitions(states, ..style) = {
+/// -> content
+#let transitions(
+  /// A transition table given as a #typ.t.dictionary of dictionaries.
+  /// -> transition-table
+  states,
+  /// Styling options.
+  /// -> any
+  ..style,
+) = {
   util.assert.no-pos(style)
   style = style.named()
 
@@ -369,7 +431,7 @@
         from,
         to,
         inputs: label,
-        label: label,
+        // label: label,
         ..style.at("transition", default: (:)),
         ..style.at(name, default: (:)),
       )

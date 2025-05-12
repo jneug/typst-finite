@@ -1,10 +1,10 @@
 #import "./draw.typ"
 
 #import "./layout.typ" as _layout
-#import "./util.typ" as util: to-spec, cetz
+#import "./util.typ" as util: cetz
 
 
-/// Creates a full @type:automaton specification for a finite automaton.
+/// Creates a full automaton specification (@type:spec) for a finite automaton.
 /// The function accepts either a partial specification and
 /// adds the missing keys by parsing the available information
 /// or takes a @type:transition-table and parses it into a full specification.
@@ -22,10 +22,23 @@
 ///
 /// -> automaton
 #let create-automaton(
+  /// Automaton specification.
+  /// -> spec | transition-table
   spec,
+  /// The list of state names in the automaton. #typ.v.auto uses
+  /// the keys of #arg[spec].
+  /// -> array
   states: auto,
+  /// The name of the initial state. #typ.v.auto uses the first
+  /// key in #arg[spec].
+  /// -> str
   initial: auto,
+  /// The list of final states. #typ.v.auto uses the last
+  /// key in #arg[spec].
+  /// -> array
   final: auto,
+  /// The list of all inputs, the automaton uses. #typ.v.auto
+  /// uses the inputs provided in #arg[spec].
   inputs: auto,
 ) = {
   // TODO: (jneug) add asserts to react to malicious specs
@@ -38,11 +51,13 @@
 
   // Make sure transition inputs are string arrays
   for (state, trans) in spec.transitions {
-    if util.is-none(trans) {
+    if util.is-empty(trans) {
       trans = (:)
     }
     for (s, inputs) in trans {
-      if type(inputs) != array {
+      if inputs == none {
+        trans.at(s) = ()
+      } else if type(inputs) != array {
         trans.at(s) = (str(inputs),)
       } else {
         trans.at(s) = inputs.map(str)
@@ -81,7 +96,7 @@
       "initial",
       util.def.if-auto(
         initial,
-        def: spec.states.first(),
+        def: spec.transitions.keys().first(),
       ),
     )
   }
@@ -89,8 +104,8 @@
   // Insert final state
   if "final" not in spec {
     if util.is-auto(final) {
-      final = (spec.states.last(),)
-    } else if is-none(final) {
+      final = (spec.transitions.keys().last(),)
+    } else if util.is-none(final) {
       final = ()
     }
     spec.insert("final", final)
@@ -133,55 +148,46 @@
 /// ```]
 ///
 /// #arg[inital] and #arg[final] can be used to customize the initial and final states.
-/// #info-alert[The #arg[inital] and #arg[final] will be removed in future
+/// #info-alert[
+///   The #arg[inital] and #arg[final] will be removed in future
 ///   versions in favor of automaton specs.
 /// ]
 ///
-/// - spec (spec): Automaton specification.
-/// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[spec] is used.
-/// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[spec] is used.
-/// - labels (dictionary): A dictionary with labels for states and transitions.
-///   #example[```
-///   #finite.automaton(
-///     (q0: (q1:none), q1: none),
-///     labels: (q0: [START], q1: [END])
-///   )
-///   ```]
-/// - style (dictionary): A dictionary with styles for states and transitions.
-/// - state-format (function): A function #lambda("string", ret:"content") to format state labels.
-///    The function will get the states name as a string and should return the final label as #dtype("content").
-///   #example[```
-///   #finite.automaton(
-///     (q0: (q1:none), q1: none),
-///     state-format: (label) => upper(label)
-///   )
-///   ```]
-/// - input-format (function): A function #lambda("array", ret:"content")
-///   to generate transition labels from input values. The functions will be
-///   called with the array of inputs and should return the final label for
-///   the transition. This is only necessary, if no label is specified.
-///   #example[```
-///   #finite.automaton(
-///     (q0: (q1:(3,0,2,1,5)), q1: none),
-///     input-format: (inputs) => inputs.sorted().rev().map(str).join("|")
-///   )
-///   ```]
-/// - layout (dictionary,function): Either a dictionary with (`state`: `coordinate`)
-///   pairs, or a layout function. See below for more information on layouts.
-///   #example[```
-///   #finite.automaton(
-///     (q0: (q1:none), q1: none),
-///     layout: (q0: (0,0), q1: (rel:(-2,1)))
-///   )
-///   ```]
-/// - ..canvas-styles (any): Arguments for #cmd-(module:"cetz")[canvas]
 /// -> content
 #let automaton(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// The name of the initial state. For #typ.v.auto, the first state in #arg[spec] is used.
+  /// -> string |  auto |  none
   initial: auto,
+  /// A list of final state names. For #typ.v.auto, the last state in #arg[spec] is used.
+  /// -> string |  auto |  none
   final: auto,
+  /// A dictionary with custom labels for states and transitions.
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:none), q1: (q2:none), q2: none),
+  ///     labels: (
+  ///       q0: [START], q1: $lambda$, q2: [END],
+  ///       q0-q1: $delta$
+  ///     )
+  ///   )
+  ///   ```]
+  /// -> dictionary
   labels: (:),
+  /// A dictionary with styles for states and transitions.
+  /// -> dictionary
   style: (:),
+  /// A function #lambda("string", ret:"content") to format state labels.
+  ///    The function will get the states name as a string and should return the final label as #dtype("content").
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:none), q1: none),
+  ///     state-format: (label) => upper(label)
+  ///   )
+  ///   ```]
+  /// -> function
   state-format: label => {
     let m = label.match(regex(`^(\D+)(\d+)$`.text))
     if m != none {
@@ -190,11 +196,33 @@
       label
     }
   },
+  /// A function #lambda("array", ret:"content")
+  ///   to generate transition labels from input values. The functions will be
+  ///   called with the array of inputs and should return the final label for
+  ///   the transition. This is only necessary, if no label is specified.
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:(3,0,2,1,5)), q1: none),
+  ///     input-format: (inputs) => inputs.sorted().rev().map(str).join("|")
+  ///   )
+  ///   ```]
+  /// -> function
   input-format: inputs => inputs.map(str).join(","),
+  /// Either a dictionary with (`state`: `coordinate`)
+  /// pairs, or a layout function. See below for more information on layouts.
+  /// #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:none), q1: none),
+  ///     layout: (q0: (0,0), q1: (rel:(-2,1)))
+  ///   )
+  ///   ```]
+  /// -> dictionary | function
   layout: _layout.linear,
+  /// Arguments for #cmd-(module:"cetz")[canvas].
+  /// -> any
   ..canvas-styles,
 ) = {
-  spec = to-spec(spec, initial: initial, final: final)
+  spec = create-automaton(spec, initial: initial, final: final)
 
   // use a dict with coordinates as custom layout
   if util.is-dict(layout) {
@@ -263,9 +291,8 @@
 
 /// Displays a transition table for an automaton.
 ///
-/// #arg[spec] is a dictionary with a specification for a
-/// finite automaton. See above for a description of the
-/// specification dictionaries.
+/// #arg[spec] is a @type:spec for a
+/// finite automaton.
 ///
 /// The table will show states in rows and inputs in columns:
 /// #example(```
@@ -276,42 +303,54 @@
 /// ))
 /// ```)
 ///
-/// #info-alert[The #arg[inital] and #arg[final] will be removed in future
-///   versions in favor of automaton specs.
+/// #info-alert[The #arg[inital] and #arg[final] arguments will be removed
+///   in future versions in favor of automaton specs.
 /// ]
 ///
-/// - spec (spec): Automaton specification.
-/// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
-/// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[states] is used.
-/// - format (function): A function to format the value in a table column. The function takes a column index and
-///   a string and generates content: #lambda("integer", "string", ret:"content").
-///   #example[```
-///   #finite.transition-table((
-///     q0: (q1: 0, q0: (1,0)),
-///     q1: (q0: 1, q2: (1,0)),
-///     q2: (q0: 1, q2: 0),
-///   ), format: (col, row, value) => if col == 1 { strong(value) } else [#value])
-///   ```]
-/// - format-list (function): Formats a list of states for display in a table cell. The function takes an array of state names and generates a string to be passed to #arg[format]:
-/// #lambda("array", ret:"string")
-///   #example[```
-///   #finite.transition-table((
-///     q0: (q1: 0, q0: (1,0)),
-///     q1: (q0: 1, q2: (1,0)),
-///     q2: (q0: 1, q2: 0),
-///   ), format-list: (states) => "[" + states.join(" | ") + "]")
-///   ```]
-/// - ..table-style (any): Arguments for #builtin("table").
 /// -> content
 #let transition-table(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// The name of the initial state. For #value(auto), the first state in #arg[states] is used.
+  /// -> str, auto, none
   initial: auto,
+  /// A list of final state names. For #value(auto), the last state in #arg[states] is used.
+  /// -> array, auto, none
   final: auto,
+  /// A function to format the value in a table cell. The function takes a column and row index and the cell content
+  /// as a #typ.t.str and generates content: #lambda("int", "int", "str", ret:"content").
+  ///   #example[```
+  ///   #finite.transition-table((
+  ///     q0: (q1: 0, q0: (1,0)),
+  ///     q1: (q0: 1, q2: (1,0)),
+  ///     q2: (q0: 1, q2: 0),
+  ///   ),
+  ///   format: (col, row, value) => if col == 0 and row == 0 {
+  ///       $delta$
+  ///     } else if col == 1 {
+  ///       strong(value)
+  ///     } else [#value]
+  ///   )
+  ///   ```]
+  /// -> function
   format: (col, row, v) => raw(str(v)),
+  /// Formats a list of states for display in a table cell. The function takes an array of state names and generates a string to be passed to @cmd:transition-table.format:
+  /// #lambda("array", ret:"str")
+  ///   #example[```
+  ///   #finite.transition-table((
+  ///     q0: (q1: 0, q0: (1,0)),
+  ///     q1: (q0: 1, q2: (1,0)),
+  ///     q2: (q0: 1, q2: 0),
+  ///   ), format-list: (states) => "[" + states.join(" | ") + "]")
+  ///   ```]
+  /// -> function
   format-list: states => states.join(", "),
+  /// Arguments for #typ.table.
+  /// -> any
   ..table-style,
 ) = {
-  spec = to-spec(spec, initial: initial, final: final)
+  spec = create-automaton(spec, initial: initial, final: final)
 
   let table-cnt = (
     format(0, 0, ""),
@@ -357,22 +396,25 @@
 /// See #link("https://en.wikipedia.org/wiki/Powerset_construction")[the Wikipedia article on powerset construction] for further
 /// details on the algorithm.
 ///
-/// #arg[spec] is a dictionary with a specification for a
-/// finite automaton. See above for a description of the
-/// specification dictionaries.
+/// #arg[spec] is an automaton @type:spec.
 ///
-/// - spec (spec): Automaton specification.
-/// - initial (string, auto, none): The name of the initial state. For #value(auto), the first state in #arg[states] is used.
-/// - final (array, auto, none): A list of final state names. For #value(auto), the last state in #arg[states] is used.
-/// - state-format (function): A function to generate the new state names from a list of states.
-///   The function takes an array of strings and returns a string: #lambda("array", ret:"string").
+/// -> spec
 #let powerset(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// The name of the initial state. For #typ.v.auto, the first state in #arg[states] is used.
+  /// -> string |  auto |  none
   initial: auto,
+  /// A list of final state names. For #typ.v.auto, the last state in #arg[states] is used.
+  /// -> string |  auto |  none
   final: auto,
+  /// A function to generate the new state names from a list of states.
+  ///   The function takes an array of strings and returns a string: #lambda("array", ret:"string").
+  /// -> function
   state-format: states => "{" + states.sorted().join(",") + "}",
 ) = {
-  spec = to-spec(spec, initial: initial, final: final)
+  spec = create-automaton(spec, initial: initial, final: final)
 
   let table = util.transpose-table(spec.transitions)
 
@@ -415,7 +457,7 @@
     }
   }
 
-  return to-spec(
+  return create-automaton(
     util.transpose-table(powerset),
     initial: new-initial,
     final: new-final,
@@ -427,9 +469,9 @@
 ///
 /// Deterministic automata need to specify a transition for every
 /// possible input. If those inputs don't transition to another
-/// state, a trap-state is introduced, that is not final
+/// state, a trap-state is introduced that is not final
 /// and can't be left by any input. To simplify
-/// transition diagrams, these trap-states are oftentimes
+/// transition diagrams, these trap-states are usually
 /// not drawn. This function adds a trap-state to such a
 /// partial automaton and thus completes it.
 ///
@@ -439,13 +481,16 @@
 ///   q1: (q0: 1)
 /// )))
 /// ```]
-///
-/// // >>> finite.add-trap((transitions: (q0: (q1: ())), inputs: (0,1))) == finite.to-spec((transitions: (q0: (TRAP:("0","1")), TRAP: (TRAP: ("0","1"))), inputs: ("0","1")))
-///
-/// - spec (spec): Automaton specification.
-/// - trap-name (string): Name for the new trap-state.
-#let add-trap(spec, trap-name: "TRAP") = {
-  spec = to-spec(spec)
+/// -> spec
+#let add-trap(
+  /// Automaton specification.
+  /// -> spec
+  spec,
+  /// Name for the new trap-state.
+  /// -> str
+  trap-name: "TRAP",
+) = {
+  spec = create-automaton(spec)
 
   let table = util.transpose-table(spec.transitions)
 
@@ -479,7 +524,7 @@
 }
 
 
-/// Tests if a #arg[word] is accepted by a given automaton.
+/// Tests if #arg[word] is accepted by a given automaton.
 ///
 /// The result if either #value(false) or an array of tuples
 /// with a state name and the input used to transition to the
@@ -496,19 +541,23 @@
 /// #finite.accepts(aut, "0101")
 /// ```]
 ///
-/// - spec (spec): Automaton specification.
-/// - word (string): A word to test.
-/// - format (function): A function to format the result.
+/// -> content
 #let accepts(
+  /// Automaton specification.
+  /// -> spec
   spec,
+  /// A word to test.
+  /// -> str
   word,
+  /// A function to format the result.
+  /// -> function
   format: (spec, states) => states
     .map(((s, i)) => if i != none [
       #s #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, raw(i))]]
     ] else [#s])
     .join(),
 ) = {
-  spec = to-spec(spec)
+  spec = create-automaton(spec)
 
   let (transitions, initial, final) = (
     spec.at("transitions", default: (:)),

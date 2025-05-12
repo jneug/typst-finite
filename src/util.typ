@@ -1,6 +1,6 @@
 
 // Package dependencies
-#import "@preview/t4t:0.4.2": *
+#import "@preview/t4t:0.4.3": *
 #import "@preview/cetz:0.3.4"
 
 // TODO: (jneug) implement scheme validation with valkyrie
@@ -367,7 +367,7 @@
 }
 
 
-/// Checks if a given @type:automaton specification represents
+/// Checks if a given @type:spec represents
 /// a deterministic automaton.
 ///
 /// ```example
@@ -402,8 +402,8 @@
 }
 
 
-
-#let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto) = {
+// deprecated!!!
+#let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto, labels: auto) = {
   // TODO: (jneug) add asserts to react to malicious specs
   // TODO: (jneug) check for duplicate names
   if "transitions" not in spec {
@@ -437,6 +437,7 @@
   } else {
     spec.inputs = spec.inputs.map(str).sorted()
   }
+
   return spec + (finite-spec: true, type: "DEA")
 }
 
