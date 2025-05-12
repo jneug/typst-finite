@@ -1,12 +1,5 @@
 # Changelog
 
-### Unreleased
-
-- Added `flaci` module to load and display files exported from FLACI:
-	- `flaci.load` loads an FLACI file as a `finite` automaton specification.
-	- `flaci.autoamton` displays an FLACI file as an `finite` automaton.
-
-
 ### Version 0.5.0
 
 - :warning: New layout system:
@@ -15,6 +8,9 @@
 	- Changed label color attribute from `color` to `fill` for consistency.
 	- The default for `state.label.fill` and `transition.label.fill` is now `none` and sets the color of the label to `stroke.paint`.
 	- The default value for `transition.curve` is now `1.0` for an easier understanding of the influence on the curvature.
+- Added `flaci` module to load and display files exported from [FLACI](http://flaci.com):
+	- `flaci.load` loads a FLACI file as a `finite` automaton specification.
+	- `flaci.automaton` displays a FLACI file as an `finite` automaton.
 
 ### Version 0.4.2
 
