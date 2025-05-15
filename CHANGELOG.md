@@ -10,7 +10,7 @@
 	- The default value for `transition.curve` is now `1.0` for an easier understanding of the influence on the curvature.
 - Added `flaci` module to load and display files exported from [FLACI](http://flaci.com):
 	- `flaci.load` loads a FLACI file as a `finite` automaton specification.
-	- `flaci.automaton` displays a FLACI file as an `finite` automaton.
+	- `flaci.automaton` displays a FLACI file as a `finite` automaton.
 
 ### Version 0.4.2
 
