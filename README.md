@@ -1,6 +1,10 @@
 <center>
 
+<<<<<<< HEAD
 ![finite-logo](docs/assets/finite-logo.png)
+=======
+![finite-logo](./docs/assets/finite-logo.png)
+>>>>>>> da40264 (Updated graphics for README and manual)
 
 </center>
 
