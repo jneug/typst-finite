@@ -1,6 +1,7 @@
 #import "../../src/finite.typ"
 
 #set page(width: auto, height: auto, margin: 5mm)
+#set text(font: "Liberation Sans")
 
 #finite.automaton(
   (
@@ -20,6 +21,7 @@
   ),
   style: (
     state: (label: (size: 20pt)),
+    transition: (curve: .8),
     q0: (initial: ""),
   ),
   layout: finite.layout.linear.with(spacing: .4),

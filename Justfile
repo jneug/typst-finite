@@ -10,7 +10,7 @@ default:
 # build assets
 assets:
     typst compile docs/assets/example.typ docs/assets/example.png
-    typst compile docs/assets/finite-logo.typ docs/assets/finite-logo.svg
+    typst compile docs/assets/finite-logo.typ docs/assets/finite-logo.png --ppi 300
     typst compile docs/assets/example.typ thumbnail-light.svg
     typst compile --input theme=dark docs/assets/example.typ thumbnail-dark.svg
 

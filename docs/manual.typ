@@ -33,25 +33,7 @@
 
   title: align(
     center,
-    finite.automaton(
-      (
-        q0: (q1: none),
-        q1: (q2: none),
-        q2: (q3: none),
-        q3: (q4: none),
-        q4: (q5: none),
-        q5: none,
-      ),
-      style: (
-        q0: (label: "F", initial: ""),
-        q1: (label: "I"),
-        q2: (label: "N"),
-        q3: (label: "I"),
-        q4: (label: "T"),
-        q5: (label: "E"),
-        state: (label: (size: 20pt)),
-      ),
-    ),
+    image("assets/finite-logo.png"),
   ),
 
   date: datetime.today(),
