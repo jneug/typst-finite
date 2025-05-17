@@ -14,5 +14,7 @@ Justfile
 # PDF manuals should be included so that they can be linked, but not their sources
 docs/*
 !docs/*.pdf
+!docs/assets
+docs/assets/*
 !docs/assets/*.png
 !docs/assets/*.svg
