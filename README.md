@@ -1,6 +1,9 @@
 <center>
 
-![finite-logo](./docs/assets/finite-logo.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/finite-logo.png">
+  <img src="./docs/assets/finite-logo.png">
+</picture>
 
 </center>
 
@@ -37,8 +40,8 @@ The output should look like this:
 <center>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./thumbnail-dark.svg">
-  <img src="./thumbnail-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/example-dark.svg">
+  <img src="./docs/assets/example.svg">
 </picture>
 
 </center>

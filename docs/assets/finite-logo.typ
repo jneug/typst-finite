@@ -1,5 +1,14 @@
 #import "../../src/finite.typ"
 
+#let theme = (
+  text: black,
+  bg: white,
+)
+#if sys.inputs.at("theme", default: "light") == "dark" {
+  theme.text = rgb("#d6d1cd")
+  theme.bg = rgb("#343534")
+}
+
 #set page(width: auto, height: auto, margin: 5mm)
 #set text(font: "Liberation Sans")
 
@@ -20,8 +29,8 @@
     },
   ),
   style: (
-    state: (label: (size: 20pt)),
-    transition: (curve: .8),
+    state: (label: (size: 20pt), fill: theme.bg, stroke: theme.text),
+    transition: (curve: .8, stroke: theme.text),
     q0: (initial: ""),
   ),
   layout: finite.layout.linear.with(spacing: .4),

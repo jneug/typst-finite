@@ -57,7 +57,7 @@
   git: git-info(file => read(file)),
 
   assets: (
-    "assets/example.png": "assets/example.typ",
+    "assets/finite-logo.png": "assets/finite-logo.typ",
   ),
 )
 
