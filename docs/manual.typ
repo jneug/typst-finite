@@ -33,7 +33,7 @@
 
   title: align(
     center,
-    image("assets/finite-logo.png"),
+    image("assets/finite-logo.svg", width: 100%),
   ),
 
   date: datetime.today(),
@@ -57,7 +57,7 @@
   git: git-info(file => read(file)),
 
   assets: (
-    "assets/finite-logo.png": "assets/finite-logo.typ",
+    "assets/finite-logo.svg": "assets/finite-logo.typ",
   ),
 )
 

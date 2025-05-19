@@ -1,6 +1,5 @@
 root := justfile_directory()
 package-fork := x'${TYPST_PKG_FORK:-}'
-
 export TYPST_ROOT := root
 
 [private]
@@ -11,8 +10,8 @@ default:
 assets:
     typst compile docs/assets/example.typ docs/assets/example.svg
     typst compile --input theme=dark docs/assets/example.typ docs/assets/example-dark.svg
-    typst compile docs/assets/finite-logo.typ docs/assets/finite-logo.png --ppi 300
-    typst compile --input theme=dark docs/assets/finite-logo.typ docs/assets/finite-logo-dark.png --ppi 300
+    typst compile docs/assets/finite-logo.typ docs/assets/finite-logo.svg
+    typst compile --input theme=dark docs/assets/finite-logo.typ docs/assets/finite-logo-dark.svg
 
 # generate manual
 doc: assets
