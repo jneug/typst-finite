@@ -1,5 +1,5 @@
 root := justfile_directory()
-package-fork := x'$TYPST_PKG_FORK'
+package-fork := x'${TYPST_PKG_FORK:-}'
 
 export TYPST_ROOT := root
 
@@ -36,13 +36,12 @@ install: (package "@local")
 install-preview: (package "@preview")
 
 [private]
-[working-directory: x'$TYPST_PKG_FORK']
+[working-directory(x'${TYPST_PKG_FORK:-.}')]
 prepare-fork:
-  git checkout main
-  git pull typst main
-  git push origin --force
+    git checkout main
+    git pull typst main
+    git push origin --force
 
-# prepare: (package package-fork)
 prepare: prepare-fork (package package-fork)
 
 # create a symbolic link to this library in the target repository

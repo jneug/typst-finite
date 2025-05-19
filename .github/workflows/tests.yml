@@ -19,7 +19,7 @@ jobs:
             tytanic: 0.2
             # the docs don't need to build with all versions supported by the package;
             # the latest one is enough
-            doc: true
+            doc: false
 
     name: Test for ${{ matrix.typst-version.typst }} (Tytanic ${{ matrix.typst-version.tytanic }}${{ matrix.typst-version.doc && ', with docs' }})
     runs-on: ubuntu-latest
