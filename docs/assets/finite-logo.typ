@@ -9,7 +9,7 @@
   theme.bg = rgb("#343534")
 }
 
-#set page(width: auto, height: auto, margin: 5mm)
+#set page(width: auto, height: auto, margin: 5mm, fill: none)
 #set text(font: "Liberation Sans")
 
 #finite.automaton(

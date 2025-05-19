@@ -1,8 +1,8 @@
 <center>
 
-<picture width="100%">
+<picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/finite-logo-dark.svg">
-  <img src="./docs/assets/finite-logo.svg">
+  <img src="./docs/assets/finite-logo.svg" width="80%">
 </picture>
 
 </center>
