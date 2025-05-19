@@ -29,11 +29,15 @@ After importing the package, simply call `#automaton()` with a dictionary holdin
 ```typst
 #import "@preview/finite:0.5.0": automaton
 
-#automaton((
-  q0: (q1:0, q0:"0,1"),
-  q1: (q0:(0,1), q2:"0"),
-  q2: (),
-))
+#automaton(
+  (
+    q0:       (q1: 0, q0: "0,1"),
+    q1:       (q0: (0, 1), q2: "0"),
+    q2:       none,
+  ),
+  initial: "q1",
+  final: ("q0",),
+)
 ```
 
 The output should look like this:
