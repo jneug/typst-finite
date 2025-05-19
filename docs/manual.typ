@@ -340,7 +340,7 @@ FINITE has a set of functions to simulate, test and view finite automata.
 
 FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"). FLACI lets you build automata in a visual online app and export your creations as JSON files. FINITE can import theses files and render the result in your document.
 
-#warning-alert[FLACI currently only supports DEA and NEA automata.]
+#warning-alert[FINITE currently only supports DEA and NEA automata.]
 
 #example[```typ
     #finite.flaci.automaton(read("flaci-export.json"))
