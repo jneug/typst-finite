@@ -162,7 +162,7 @@
   /// -> string |  auto |  none
   initial: auto,
   /// A list of final state names. For #typ.v.auto, the last state in #arg[spec] is used.
-  /// -> string |  auto |  none
+  /// -> array |  auto |  none
   final: auto,
   /// A dictionary with custom labels for states and transitions.
   ///   #example[```
