@@ -1,5 +1,5 @@
 #import "util.typ"
-#import util: default-style, cetz, test, assert-dict, assert-spec
+#import util: assert-dict, assert-spec, cetz, default-style, test
 
 
 /// Helper function to create a layout dictionary by providing
@@ -14,7 +14,7 @@
 /// state #dtype("coordinate")s.
 ///
 /// The result may specify a `rest` key that is used as a default coordinate. This is useful
-/// sense in combination with a relative coordinate like `(rel:(2,0))`.
+/// in combination with a relative coordinate like `(rel:(2,0))`.
 ///
 /// #example(breakable:true)[```
 /// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), none); d})

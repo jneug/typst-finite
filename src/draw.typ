@@ -26,9 +26,9 @@
   label: auto,
   /// Whether this is an initial state. This can be either
   ///   - #value(true),
-  ///   - an #dtype("alignment") to specify an anchor for the inital marking,
+  ///   - an #dtype("alignment") to specify an anchor for the initial marking,
   ///   - a #dtype("string") to specify text for the initial marking,
-  ///   - an #dtype("dictionary") with the keys `anchor` and `label` to specifiy both an anchor and a text label for the marking. Additionally, the keys `stroke` and `scale` can be used to style the marking.
+  ///   - an #dtype("dictionary") with the keys `anchor` and `label` to specify both an anchor and a text label for the marking. Additionally, the keys `stroke` and `scale` can be used to style the marking.
   /// -> boolean | alignment | dictionary
   initial: false,
   /// Whether this is a final state.
@@ -143,9 +143,6 @@
         if style.label.fill in (auto, none) {
           style.label.fill = stroke(style.stroke).paint
         }
-        if style.label.fill == auto {
-          style.label.fill = black
-        }
 
         cetz.draw.content(
           "state.center",
@@ -204,7 +201,7 @@
   /// Anchor for loops. Has no effect on normal transitions.
   /// -> alignment
   anchor: top,
-  ///Styling options.
+  /// Styling options.
   /// -> any
   ..style,
 ) = {
@@ -309,9 +306,6 @@
         if style.label.fill in (auto, none) {
           style.label.fill = stroke(style.stroke).paint
         }
-        if style.label.fill == auto {
-          style.label.fill = black
-        }
 
         let label-pt = util.label-pt(start, end, ctrl1, ctrl2, style, loop: start == end)
         cetz.draw.content(
@@ -382,7 +376,7 @@
   /// Anchor for the loop.
   /// -> alignment
   anchor: top,
-  ///Styling options.
+  /// Styling options.
   /// -> any
   ..style,
 ) = transition(

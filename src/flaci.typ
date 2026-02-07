@@ -1,5 +1,5 @@
 #import "./cmd.typ"
-#import "./util.typ": get, vec-to-align, align-to-vec
+#import "./util.typ": align-to-vec, get, vec-to-align
 
 #let _bom = bytes((239, 187, 191))
 // Parse a string with BOM into a JSON dictionary.
@@ -124,7 +124,7 @@
 ///
 /// #warning-alert[
 ///   Read the FLACI json-file with the #typ.read function, not
-///   the #typ.json function. FLACI exports automatons with a wrong encoding
+///   the #typ.json function. FLACI exports automata with a wrong encoding
 ///   that prevents Typst from properly loading the file as JSON.
 /// ]
 ///

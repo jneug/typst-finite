@@ -147,9 +147,9 @@
 /// ))
 /// ```]
 ///
-/// #arg[inital] and #arg[final] can be used to customize the initial and final states.
+/// #arg[initial] and #arg[final] can be used to customize the initial and final states.
 /// #info-alert[
-///   The #arg[inital] and #arg[final] will be removed in future
+///   The #arg[initial] and #arg[final] will be removed in future
 ///   versions in favor of automaton specs.
 /// ]
 ///
@@ -303,7 +303,7 @@
 /// ))
 /// ```)
 ///
-/// #info-alert[The #arg[inital] and #arg[final] arguments will be removed
+/// #info-alert[The #arg[initial] and #arg[final] arguments will be removed
 ///   in future versions in favor of automaton specs.
 /// ]
 ///
