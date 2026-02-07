@@ -215,7 +215,6 @@
   let at = 0.0
   for name in spec.states {
     let state-radius = radii.at(name)
-    let ang = 0deg
     let ang = (
       offset
         + util.math.map(
