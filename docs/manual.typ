@@ -95,12 +95,12 @@ FINITE helps you draw transition diagrams for finite automata in your Typst docu
 
 To draw an automaton, simply import #cmd[automaton] from FINITE and use it like this:
 #example[```typ
-  #automaton((
-    q0: (q1:0, q0:"0,1"),
-    q1: (q0:(0,1), q2:"0"),
-    q2: none,
-  ))
-  ```]
+#automaton((
+  q0: (q1:0, q0:"0,1"),
+  q1: (q0:(0,1), q2:"0"),
+  q2: none,
+))
+```]
 
 As you can see, an automaton is defined by a dictionary of dictionaries. The keys of the top-level dictionary are the names of states to draw. The second-level dictionaries use the names of connected states as keys and transition labels as values.
 
@@ -110,46 +110,46 @@ See @aut-specs for more details on how to specify automata.
 
 To modify the layout and style of the transition diagram, #cmd-[automaton] accepts a set of options:
 #example(breakable: true)[```typ
-  #automaton(
-    (
-      q0: (q1:0, q0:"0,1"),
-      q1: (q0:(0,1), q2:"0"),
-      q2: (),
-    ),
-    initial: "q1",
-    final: ("q0", "q2"),
-    labels:(
-      q2: "FIN"
-    ),
-    style:(
-      state: (fill: luma(248), stroke:luma(120)),
-      transition: (stroke: (dash:"dashed")),
-      q0-q0: (anchor:top+left),
-      q1: (initial:top),
-      q1-q2: (stroke: 2pt + red)
-    )
+#automaton(
+  (
+    q0: (q1:0, q0:"0,1"),
+    q1: (q0:(0,1), q2:"0"),
+    q2: (),
+  ),
+  initial: "q1",
+  final: ("q0", "q2"),
+  labels:(
+    q2: "FIN"
+  ),
+  style:(
+    state: (fill: luma(248), stroke:luma(120)),
+    transition: (stroke: (dash:"dashed")),
+    q0-q0: (anchor:top+left),
+    q1: (initial:top),
+    q1-q2: (stroke: 2pt + red)
   )
-  ```]
+)
+```]
 
 For larger automata, the states can be arranged in different ways:
 #example(breakable: true)[```typ
-  #let aut = (:)
-  #for i in range(10) {
-    let name = "q"+str(i)
-    aut.insert(name, (:))
-    if i < 9 {
-      aut.at(name).insert("q" + str(i + 1), none)
-    }
+#let aut = (:)
+#for i in range(10) {
+  let name = "q"+str(i)
+  aut.insert(name, (:))
+  if i < 9 {
+    aut.at(name).insert("q" + str(i + 1), none)
   }
-  #automaton(
-    aut,
-    layout: finite.layout.circular.with(offset: 45deg),
-    style: (
-      transition: (curve: 0),
-      q0: (initial: top+left)
-    )
+}
+#automaton(
+  aut,
+  layout: finite.layout.circular.with(offset: 45deg),
+  style: (
+    transition: (curve: 0),
+    q0: (initial: top+left)
   )
-  ```]
+)
+```]
 
 See @using-layout for more on layouts.
 
@@ -163,12 +163,12 @@ If an automaton has only one final state, the spec can simply be a @type:transit
 A transition table is a #typ.t.dict with state names as keys and dictionaries as values. The nested dictionaries have state names as keys and the transition inputs / labels as values.
 
 #codesnippet[```typc
-  (
-    q0: (q1: (0, 1), q2: (0, 1)),
-    q1: (q1: (0, 1), q0: 0, q2: 1),
-    q2: (q0: 0, q1: (1, 0)),
-  )
-  ```]
+(
+  q0: (q1: (0, 1), q2: (0, 1)),
+  q1: (q1: (0, 1), q0: 0, q2: 1),
+  q2: (q0: 0, q1: (1, 0)),
+)
+```]
 
 #custom-type("spec", color: rgb("#76d6ff"))
 A specification (@type:spec) is composed of these keys:
@@ -195,7 +195,7 @@ A specification (@type:spec) is composed of these keys:
 - `initial` is an optional name of the initial state. The first value in `states` is used by default.
 - `final` is an optional array of final states. The last value in `states` is used by default.
 
-The utility function #cmd(module: "util")[to-spec] can be used to create a full spec from a partial dictionary by filling in the missing values with the defaults.
+The utility function #cmd(module: "util")[create-automaton] can be used to create a full spec from a partial dictionary by filling in the missing values with the defaults.
 
 == Command reference
 #show-module("cmd", sort-functions: false)
@@ -206,22 +206,22 @@ As common in CETZ, you can pass general styles for states and transitions to the
 
 #cmd[automaton] takes a #arg[style] argument that passes the given style to the above functions. The example below sets a background and stroke color for all states and draws transitions with a dashed style. Additionally, the state `q1` has the arrow indicating an initial state drawn from above instead from the left. The transition from `q1` to `q2` is highlighted in red.
 #example(breakable: true)[```typ
-  #automaton(
-    (
-      q0: (q1:0, q0:"0,1"),
-      q1: (q0:(0,1), q2:"0"),
-      q2: (),
-    ),
-    initial: "q1",
-    final: ("q0", "q2"),
-    style:(
-      state: (fill: luma(248), stroke:luma(120)),
-      transition: (stroke: (dash:"dashed")),
-      q1: (initial:top),
-      q1-q2: (stroke: 2pt + red)
-    )
+#automaton(
+  (
+    q0: (q1:0, q0:"0,1"),
+    q1: (q0:(0,1), q2:"0"),
+    q2: (),
+  ),
+  initial: "q1",
+  final: ("q0", "q2"),
+  style:(
+    state: (fill: luma(248), stroke:luma(120)),
+    transition: (stroke: (dash:"dashed")),
+    q1: (initial:top),
+    q1-q2: (stroke: 2pt + red)
   )
-  ```]
+)
+```]
 
 Every state can be accessed by its name and every transition is named with its initial and end state joined with a dash (`-`), for example `q1-q2`.
 
@@ -258,22 +258,22 @@ The supported styling options (and their defaults) are as follows:
 
 The above commands use custom CETZ elements to draw states and transitions. For complex automata, the functions in the #module[draw] module can be used inside a call to #cetz-cmd-[canvas].
 #example(breakable: true)[```typ
-  #cetz.canvas({
-    import cetz.draw: set-style
-    import finite.draw: state, transition
+#cetz.canvas({
+  import cetz.draw: set-style
+  import finite.draw: state, transition
 
-    state((0,0), "q0", initial:true)
-    state((2,1), "q1")
-    state((4,-1), "q2", final:true)
-    state((rel:(0, -3), to:"q1.south"), "trap", label:"TRAP", anchor:"north-west")
+  state((0,0), "q0", initial:true)
+  state((2,1), "q1")
+  state((4,-1), "q2", final:true)
+  state((rel:(0, -3), to:"q1.south"), "trap", label:"TRAP", anchor:"north-west")
 
-    transition("q0", "q1", inputs:(0,1))
-    transition("q1", "q2", inputs:(0))
-    transition("q1", "trap", inputs:(1), curve:-1)
-    transition("q2", "trap", inputs:(0,1))
-    transition("trap", "trap", inputs:(0,1))
-  })
-  ```]
+  transition("q0", "q1", inputs:(0,1))
+  transition("q1", "q2", inputs:(0))
+  transition("q1", "trap", inputs:(1), curve:-1)
+  transition("q2", "trap", inputs:(0,1))
+  transition("trap", "trap", inputs:(0,1))
+})
+```]
 
 === Element functions
 #show-module("draw", sort-functions: false)
@@ -289,34 +289,34 @@ States and transitions are created in a #cetz-draw[group]. States are drawn with
 Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content]) element. The anchors of `arrow` are copied to the group.
 
 #example(breakable: true)[```typ
-  #cetz.canvas({
-    import cetz.draw: circle, line, content
-    import finite.draw: state, transition
+#cetz.canvas({
+  import cetz.draw: circle, line, content
+  import finite.draw: state, transition
 
-    let magenta = rgb("#dc41f1")
+  let magenta = rgb("#dc41f1")
 
-    state((0, 0), "q0")
-    state((4, 0), "q1", final: true, stroke: magenta)
+  state((0, 0), "q0")
+  state((4, 0), "q1", final: true, stroke: magenta)
 
-    transition("q0", "q1", label: $epsilon$)
+  transition("q0", "q1", label: $epsilon$)
 
-    circle("q0.north-west", radius: .4em, stroke: none, fill: black)
+  circle("q0.north-west", radius: .4em, stroke: none, fill: black)
 
-    let magenta-stroke = 2pt + magenta
-    circle("q0-q1.label", radius: .5em, stroke: magenta-stroke)
-    line(
-      name: "q0-arrow",
-      (rel: (.6, .6), to: "q1.state.north-east"),
-      (rel: (.1, .1), to: "q1.state.north-east"),
-      stroke: magenta-stroke,
-      mark: (end: ">"),
-    )
-    content(
-      (rel: (0, .25), to: "q0-arrow.start"),
-      text(fill: magenta, [*very important state*]),
-    )
-  })
-  ``` ]
+  let magenta-stroke = 2pt + magenta
+  circle("q0-q1.label", radius: .5em, stroke: magenta-stroke)
+  line(
+    name: "q0-arrow",
+    (rel: (.6, .6), to: "q1.state.north-east"),
+    (rel: (.1, .1), to: "q1.state.north-east"),
+    stroke: magenta-stroke,
+    mark: (end: ">"),
+  )
+  content(
+    (rel: (0, .25), to: "q0-arrow.start"),
+    text(fill: magenta, [*very important state*]),
+  )
+})
+``` ]
 
 == Layouts <using-layout>
 
@@ -343,8 +343,8 @@ FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"
 #warning-alert[FINITE currently only supports DEA and NEA automata.]
 
 #example[```typ
-    #finite.flaci.automaton(read("flaci-export.json"))
-  ```][
+  #finite.flaci.automaton(read("flaci-export.json"))
+```][
   #finite.flaci.automaton(read("assets/flaci-export.json"))
 ]
 
@@ -364,63 +364,63 @@ FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"
 
 Since transition diagrams are effectively graphs, FINITE could also be used to draw graph structures:
 #example[```typ
-  #cetz.canvas({
-    import cetz.draw: set-style
-    import finite.draw: state, transitions
+#cetz.canvas({
+  import cetz.draw: set-style
+  import finite.draw: state, transitions
 
-    state((0,0), "A")
-    state((3,1), "B")
-    state((4,-2), "C")
-    state((1,-3), "D")
-    state((6,1), "E")
+  state((0,0), "A")
+  state((3,1), "B")
+  state((4,-2), "C")
+  state((1,-3), "D")
+  state((6,1), "E")
 
-    transitions((
-        A: (B: 1.2),
-        B: (C: .5, E: 2.3),
-        C: (B: .8, D: 1.4, E: 4.5),
-        D: (A: 1.8),
-        E: (:)
-      ),
-      C-E: (curve: -1.2))
-  })
-  ```]
+  transitions((
+      A: (B: 1.2),
+      B: (C: .5, E: 2.3),
+      C: (B: .8, D: 1.4, E: 4.5),
+      D: (A: 1.8),
+      E: (:)
+    ),
+    C-E: (curve: -1.2))
+})
+```]
 
 = Showcase <sec:showcase>
 
 #example(breakable: true)[```typ
-  #scale(80%, automaton((
-      q0: (q1: 0, q2: 0),
-      q2: (q3: 1, q4: 0),
-      q4: (q2: 0, q5: 0, q6: 0),
-      q6: (q7: 1),
-      q1: (q3: 1, q4: 0),
-      q3: (q1: 1, q5: 1, q6: 1),
-      q5: (q7: 1),
-      q7: ()
+#scale(80%, automaton((
+    q0: (q1: 0, q2: 0),
+    q2: (q3: 1, q4: 0),
+    q4: (q2: 0, q5: 0, q6: 0),
+    q6: (q7: 1),
+    q1: (q3: 1, q4: 0),
+    q3: (q1: 1, q5: 1, q6: 1),
+    q5: (q7: 1),
+    q7: ()
+  ),
+  layout: finite.layout.group.with(grouping: (
+      ("q0",),
+      ("q1", "q2", "q3", "q4", "q5", "q6"),
+      ("q7",)
     ),
-    layout: finite.layout.group.with(grouping: (
-        ("q0",),
-        ("q1", "q2", "q3", "q4", "q5", "q6"),
-        ("q7",)
-      ),
-      spacing: 2,
-      layout: (
-        finite.layout.custom.with(positions: (q0: (0, -2))),
-        finite.layout.grid.with(columns:3, spacing:2.6, position: (2, 1)),
-        finite.layout.custom.with(positions: (q7: (8, 6)))
-      )
-    ),
-    style: (
-      transition: (curve: 0),
-      q1-q3: (curve:1),
-      q3-q1: (curve:1),
-      q2-q4: (curve:1),
-      q4-q2: (curve:1),
-      q1-q4: (label: (pos:.75)),
-      q2-q3: (label: (pos:.75, dist:-.33)),
-      q3-q6: (label: (pos:.75)),
-      q4-q5: (label: (pos:.75, dist:-.33)),
-      q4-q6: (curve: 1)
+    spacing: 2,
+    layout: (
+      finite.layout.custom.with(positions: (q0: (0, -2))),
+      finite.layout.grid.with(columns:3, spacing:2.6, position: (2, 1)),
+      finite.layout.custom.with(positions: (q7: (8, 6)))
     )
-  ))
-  ```]
+  ),
+  style: (
+    transition: (curve: 0),
+    q1-q3: (curve:1),
+    q3-q1: (curve:1),
+    q2-q4: (curve:1),
+    q4-q2: (curve:1),
+    q1-q4: (label: (pos:.75)),
+    q2-q3: (label: (pos:.75, dist:-.33)),
+    q3-q6: (label: (pos:.75)),
+    q4-q5: (label: (pos:.75, dist:-.33)),
+    q4-q6: (curve: 1)
+  )
+))
+```]
