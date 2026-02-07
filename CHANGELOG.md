@@ -16,8 +16,8 @@
 
 - Fixed label rotation for transitions.
 - Bumped dependencies:
-	- CeTZ 0.3.0 :arrow upper right: 0.3.1
-	- t4t 0.3.1 :arrow upper right: 0.4.0
+	- CeTZ 0.3.0 :arrow_upper_right: 0.3.1
+	- t4t 0.3.1 :arrow_upper_right: 0.4.0
 
 ### Version 0.4.1
 
@@ -45,7 +45,7 @@
 - Changes to `automaton` command:
 	- Changed `label-format` argument to `state-format` and `input-format`.
 	- `layout` can now take a dictionary with (`state`: `coordinate`)  pairs to position states.
-- Added `#powerset` command, to transform a NFA into a DFA.
+- Added `#powerset` command, to transform an NFA into a DFA.
 - Added `#add-trap` command, to complete a partial DFA.
 - Added `#accepts` command, to test a word against an NFA or DFA.
 - Added `transpose-table` and `get-inputs` utilities.

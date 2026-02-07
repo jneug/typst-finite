@@ -8,7 +8,7 @@
 </center>
 
 [![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjneug%2Ftypst-finite%2Frefs%2Fheads%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/finite)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/lilaq-project/lilaq/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/jneug/typst-finite/blob/main/LICENSE)
 [![Tests](https://github.com/jneug/typst-finite/actions/workflows/tests.yml/badge.svg)](https://github.com/jneug/typst-finite/actions/workflows/tests.yml)
 
 

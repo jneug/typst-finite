@@ -102,7 +102,7 @@ To draw an automaton, simply import #cmd[automaton] from FINITE and use it like 
   ))
   ```]
 
-As you can see, an automaton ist defined by a dictionary of dictionaries. The keys of the top-level dictionary are the names of states to draw. The second-level dictionaries use the names of connected states as keys and transition labels as values.
+As you can see, an automaton is defined by a dictionary of dictionaries. The keys of the top-level dictionary are the names of states to draw. The second-level dictionaries use the names of connected states as keys and transition labels as values.
 
 In the example above, the states `q0`, `q1` and `q2` are defined. `q0` is connected to `q1` and has a loop to itself. `q1` transitions to `q2` and back to `q0`. #cmd-[automaton] selected the first state in the dictionary (in this case `q0`) to be the initial state and the last (`q2`) to be a final state.
 
@@ -131,7 +131,7 @@ To modify the layout and style of the transition diagram, #cmd-[automaton] accep
   )
   ```]
 
-For larger automatons, the states can be arranged in different ways:
+For larger automata, the states can be arranged in different ways:
 #example(breakable: true)[```typ
   #let aut = (:)
   #for i in range(10) {
@@ -153,9 +153,9 @@ For larger automatons, the states can be arranged in different ways:
 
 See @using-layout for more on layouts.
 
-== Specifing finite automata <aut-specs>
+== Specifying finite automata <aut-specs>
 
-Most of FINITEs commands expect a finite automaton specification ("@type:spec" in short) the first argument. These specifications are dictionaries defining the elements of the automaton.
+Most of FINITEs commands expect a finite automaton specification ("@type:spec" in short) as the first argument. These specifications are dictionaries defining the elements of the automaton.
 
 If an automaton has only one final state, the spec can simply be a @type:transition-table. In other cases, the specification can explicitly define the various elements.
 
@@ -324,7 +324,7 @@ Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content])
   Layouts changed in FINITE version 0.5 and are no longer compatible with FINITE 0.4 and before.
 ]
 
-Layouts can be passed to @cmd:automaton to position states on the canvas without the need to give specific coordinates for each state. FINITE ships with a bunch of layouts, to accomodate different scenarios.
+Layouts can be passed to @cmd:automaton to position states on the canvas without the need to give specific coordinates for each state. FINITE ships with a bunch of layouts, to accommodate different scenarios.
 
 === Available layouts <available-layouts>
 #show-module("layout", sort-functions: false)
@@ -338,7 +338,7 @@ FINITE has a set of functions to simulate, test and view finite automata.
 
 = FLACI support
 
-FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"). FLACI lets you build automata in a visual online app and export your creations as JSON files. FINITE can import theses files and render the result in your document.
+FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"). FLACI lets you build automata in a visual online app and export your creations as JSON files. FINITE can import these files and render the result in your document.
 
 #warning-alert[FINITE currently only supports DEA and NEA automata.]
 
