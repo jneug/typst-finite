@@ -7,7 +7,7 @@
 // #import "@preview/valkyrie:0.2.1" as t
 
 // TODO: (jneug) don't import into global scope
-#import cetz.util.bezier: cubic-point, cubic-derivative, cubic-through-3points
+#import cetz.util.bezier: cubic-derivative, cubic-point, cubic-through-3points
 
 
 // TODO (jneug) refactor module and cleanup
@@ -402,46 +402,6 @@
 }
 
 
-// deprecated!!!
-#let to-spec(spec, states: auto, initial: auto, final: auto, inputs: auto, labels: auto) = {
-  // TODO: (jneug) add asserts to react to malicious specs
-  // TODO: (jneug) check for duplicate names
-  if "transitions" not in spec {
-    spec = (transitions: spec)
-  }
-  if "states" not in spec {
-    if is-auto(states) {
-      states = spec.transitions.keys()
-    }
-    spec.insert("states", states)
-  }
-  if "initial" not in spec {
-    if is-auto(initial) {
-      initial = spec.states.first()
-    }
-    spec.insert("initial", initial)
-  }
-  if "final" not in spec {
-    if is-auto(final) {
-      final = (spec.states.last(),)
-    } else if is-none(final) {
-      final = ()
-    }
-    spec.insert("final", final)
-  }
-  if "inputs" not in spec {
-    if is-auto(inputs) {
-      inputs = get-inputs(spec.transitions)
-    }
-    spec.insert("inputs", inputs)
-  } else {
-    spec.inputs = spec.inputs.map(str).sorted()
-  }
-
-  return spec + (finite-spec: true, type: "DEA")
-}
-
-
 /// Return anchor name for an #dtype(alignment).
 #let align-to-anchor(align) = {
   let anchor = ()
@@ -482,82 +442,12 @@
 }
 
 
-#let is-state(element) = {
-  return "finite" in element and element.finite.state
-}
-
-#let is-transition(element) = {
-  return "finite" in element and element.finite.transition
-}
-
-#let resolve-one(ctx, element) = {
-  element = (element)(ctx)
-  ctx = element.ctx
-
-  if "name" in element and element.name != none {
-    if "nodes" not in ctx {
-      ctx.insert("nodes", (:))
-    }
-    ctx.nodes.insert(element.name, element)
-  }
-
-  return (ctx, element)
-}
-
-#let resolve-many(ctx, body) = {
-  let elements = ()
-  let (_ctx, element) = (ctx, none)
-  for element in body {
-    (_ctx, element) = resolve-one(_ctx, element)
-    elements.push(element)
-  }
-  return (_ctx, elements)
-}
-
-#let resolve-zipped(ctx, body) = {
-  let (_ctx, elements) = resolve-many(ctx, body)
-  return (_ctx, body.zip(elements))
-}
-
-#let resolve-states(ctx, body) = {
-  let (_, elements) = resolve-many(ctx, body)
-  return elements.filter(is-state)
-}
-
-#let get-radii(elements) = {
-  return elements
-    .filter(is-state)
-    .fold(
-      (:),
-      (radii, element) => {
-        radii.insert(element.name, element.finite.radius)
-        return radii
-      },
-    )
-}
-
 // Resolve radii for states by applying styles from other elements.
 #let resolve-radii(ctx, body) = {
   let (_, elements) = resolve-many(ctx, body)
   return get-radii(elements)
 }
 
-#let state-wrapper(group) = {
-  return (
-    ctx => {
-      let g = (group.first())(ctx)
-      g.insert(
-        "finite",
-        (
-          state: true,
-          transition: false,
-          radius: (g.anchors)("state.east").at(0) - (g.anchors)("state.center").at(0),
-        ),
-      )
-      return g
-    },
-  )
-}
 
 #let get-radii(spec, style: (:)) = spec.states.fold(
   (:),
