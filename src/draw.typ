@@ -246,21 +246,19 @@
         style.label.insert("text", inputs.map(str).join(","))
       }
 
+      // resolve custom loop styles first
+      if from == to {
+        style = cetz.styles.resolve(
+          ctx.style.at("loop", default: (:)),
+          merge: style,
+        )
+      }
       let style = cetz.styles.resolve(
         ctx.style,
         merge: style,
         base: util.default-style.transition,
         root: "transition",
       )
-      // resolve loop styles on top
-      if from == to {
-        style = cetz.styles.resolve(
-          ctx.style,
-          merge: ctx.style.at("loop", default: (:)),
-          base: style,
-          root: "transition",
-        )
-      }
 
       let (_, start, f-center, f-right, end, t-center, t-right) = cetz.coordinate.resolve(
         ctx,
