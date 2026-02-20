@@ -208,8 +208,6 @@
   // No extra positional arguments from the style sink
   util.assert.no-pos(style)
 
-  // TODO: (jneug) allow labels with math or content
-
   // Name of two states required
   util.assert.all-of-type(str, from, to)
   let name = from.split(".").last() + "-" + to.split(".").last()
@@ -243,8 +241,8 @@
       } else {
         style.label = label
       }
+
       if not "text" in style.label and util.not-none(inputs) {
-        // TODO: (jneug) add input-label-format function
         style.label.insert("text", inputs.map(str).join(","))
       }
 

@@ -40,6 +40,10 @@
   /// The list of all inputs, the automaton uses. #typ.v.auto
   /// uses the inputs provided in #arg[spec].
   inputs: auto,
+  // TODO: allow arbitrary input labels
+  // labels: (:),
+  // TODO: Allow function for labels
+  input-labels: (:),
 ) = {
   // TODO: (jneug) add asserts to react to malicious specs
   util.assert.any-type(dictionary, spec)
@@ -58,9 +62,15 @@
       if inputs == none {
         trans.at(s) = ()
       } else if type(inputs) != array {
-        trans.at(s) = (str(inputs),)
-      } else {
-        trans.at(s) = inputs.map(str)
+        trans.at(s) = (inputs,)
+      }
+
+      for (i, input) in trans.at(s).enumerate() {
+        let input-str = util.get.text(input)
+        if type(input) == content {
+          input-labels.insert(input-str, input)
+        }
+        trans.at(s).at(i) = input-str
       }
     }
     spec.transitions.at(state) = trans
@@ -90,7 +100,6 @@
     )
   }
 
-
   if "initial" not in spec {
     spec.insert(
       "initial",
@@ -119,6 +128,11 @@
   } else {
     spec.inputs = spec.inputs.map(str).sorted()
   }
+
+  if "input-labels" in spec {
+    input-labels += spec.input-labels
+  }
+  spec.insert("input-labels", input-labels)
 
   if util.is-dea(spec.transitions) {
     spec.insert("type", "DEA")
@@ -176,6 +190,10 @@
   ///   ```]
   /// -> dictionary
   labels: (:),
+  /// A dictionary with custom labels for inputs.
+  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// -> dictionary | function
+  input-labels: (:),
   /// A dictionary with styles for states and transitions.
   /// -> dictionary
   style: (:),
@@ -207,7 +225,7 @@
   ///   )
   ///   ```]
   /// -> function
-  input-format: inputs => inputs.map(str).join(","),
+  input-format: inputs => inputs.join([,]),
   /// Either a dictionary with (`state`: `coordinate`)
   /// pairs, or a layout function. See below for more information on layouts.
   /// #example[```
@@ -223,6 +241,11 @@
   ..canvas-styles,
 ) = {
   spec = create-automaton(spec, initial: initial, final: final)
+  if util.is-dict(input-labels) {
+    spec.input-labels += input-labels
+  } else {
+    spec.input-labels = spec.inputs.map(i => (i, input-labels(i))).to-dict()
+  }
 
   // use a dict with coordinates as custom layout
   if util.is-dict(layout) {
@@ -258,20 +281,21 @@
           for (to, inputs) in transitions {
             let name = from + "-" + to
 
-            // prepare inputs (may be a string or int)
-            if inputs == none {
-              inputs = ()
-            } else if not util.is-arr(inputs) {
-              inputs = str(inputs).split(",")
-            }
+            // prepare input labels
+            let inputs-labeled = inputs.map(i => spec.input-labels.at(i, default: i))
 
             // prepare label
             let label = labels.at(
               name,
-              default: input-format(inputs),
+              default: input-format(inputs-labeled),
             )
-            if util.is-dict(label) and "text" not in label {
-              label.text = input-format(inputs)
+            if not util.is-dict(label) {
+              label = (text: label)
+            } else if "text" not in label {
+              label.text = input-format(inputs-labeled)
+            }
+            if "label" in style.at(name, default: (:)) {
+              label += style.at(name).remove("label")
             }
 
             // create transition
@@ -566,9 +590,9 @@
   )
   transitions = util.transpose-table(transitions)
 
-  util.assert.that(transitions != (:))
-  util.assert.that(initial != none)
-  util.assert.that(final != ())
+  util.assert.that(transitions != (:), message: "Transitions may not be empty.")
+  util.assert.that(initial != none, message: "Initial state must be given.")
+  util.assert.that(final != (), message: "Final state must be given.")
 
   let next-symbol(word, inputs) = {
     for sym in inputs {
