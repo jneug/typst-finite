@@ -1,7 +1,7 @@
 
 // Package dependencies
 #import "@preview/t4t:0.4.3": *
-#import "@preview/cetz:0.3.4"
+#import "@preview/cetz:0.4.2"
 
 // TODO: (jneug) implement scheme validation with valkyrie
 // #import "@preview/valkyrie:0.2.1" as t
