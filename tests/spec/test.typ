@@ -17,7 +17,7 @@
   q13: (q14: 0),
   q14: (q15: 0),
   q15: (q16: 1),
-  q16: (q17: "λ"),
+  q16: (q17: $lambda$),
   q17: (q18: "λ"),
   q18: (q19: "λ", q23: "λ"),
   q19: (q20: 1),
@@ -34,3 +34,5 @@
 #assert.eq(spec.final, ("q23",))
 #assert.eq(spec.states.sorted(), aut.keys().sorted())
 #assert.eq(spec.inputs.sorted(), ("0", "1", "λ"))
+
+#spec
