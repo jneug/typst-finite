@@ -118,6 +118,8 @@
 }
 
 #let vec-to-align(vec) = {
+  if vec == (0, 0) { return top }
+
   let angle = cetz.vector.angle2((0, 0), vec) / 1deg
   if angle < 0 { angle = angle + 360 }
   let idx = calc.round((angle - 22.5) / 45 + .5)
