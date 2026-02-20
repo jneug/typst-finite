@@ -291,7 +291,7 @@
   let s = def.if-auto(ctx.length, size)
 
   let m = (width: 2 * width, height: 2 * height)
-  while (m.height > height or m.width > height) and s > min-size {
+  while (m.height > height or m.width > width) and s > min-size {
     s = s * .88
     m = cetz.util.measure(
       ctx,
