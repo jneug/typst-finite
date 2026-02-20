@@ -11,6 +11,8 @@
 - Added `flaci` module to load and display files exported from [FLACI](http://flaci.com):
 	- `flaci.load` loads a FLACI file as a `finite` automaton specification.
 	- `flaci.automaton` displays a FLACI file as a `finite` automaton.
+- Fixed individual loop styles being overriden by global styles (by @hxjerry)
+- Documentation improvements (thanks @CSharperMantle)
 
 ### Version 0.4.2
 
