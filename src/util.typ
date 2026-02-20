@@ -82,6 +82,7 @@
   message: v => "full automaton specification expected. got " + repr(v),
 )
 
+#let round-coord(coord, digits: 10) = coord.map(calc.round.with(digits: digits))
 
 // =================================
 //  Vectors

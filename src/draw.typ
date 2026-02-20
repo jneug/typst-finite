@@ -273,14 +273,18 @@
         f-right.at(0) - f-center.at(0),
         t-right.at(0) - t-center.at(0),
       )
+
       let (start, end, ctrl1, ctrl2) = util.transition-pts(
-        start,
-        end,
+        // Sometimes rounding errors cause strange control points,
+        // rounding should fix this.
+        util.round-coord(start),
+        util.round-coord(end),
         start-rad,
         end-rad,
         curve: style.curve * .75,
         anchor: anchor,
       )
+
       cetz.draw.bezier(
         name: "arrow",
         start,
