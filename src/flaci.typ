@@ -1,5 +1,5 @@
 #import "./cmd.typ"
-#import "./util.typ": align-to-vec, get, vec-to-align
+#import "./util.typ": get, vec-to-align
 
 #let _bom = bytes((239, 187, 191))
 // Parse a string with BOM into a JSON dictionary.
@@ -56,10 +56,10 @@
     id-map.insert(str(state.ID), name)
 
     // Final and initial states
-    if state.Final {
+    if state.at("Final", default: false) {
       final.push(name)
     }
-    if state.Start {
+    if state.at("Start", default: false) {
       initial = name
     }
 
@@ -87,9 +87,11 @@
     for transition in state.Transitions {
       if transition.Source == id {
         state-transitions.insert(id-map.at(str(transition.Target)), transition.Labels)
-      } else {
-        state-transitions.insert(id-map.at(str(transition.Source)), transition.Labels)
       }
+      // TODO: Are there cases where transition.Source != id ?
+      // else {
+      //   state-transitions.insert(id-map.at(str(transition.Source)), transition.Labels)
+      // }
 
       if transition.Source == transition.Target {
         let vec = (transition.x, -transition.y)
@@ -142,12 +144,13 @@
   /// Custom state positions to merge with the ones found in #arg[data].
   /// This allows the placement of some states while the
   /// rest keeps their positions.
-  /// -> dictionary
+  /// -> bool
   merge-layout: true,
   /// Custom styles to overwrite the defaults.
   /// -> dictionary
   style: auto,
   /// Custom styles to merge with the styles from #arg[data].
+  /// -> bool
   merge-style: true,
   /// Further arguments for @cmd:automaton.
   /// -> any

@@ -241,6 +241,7 @@
 
     positions.insert(name, pos)
 
+    // TODO: no path anchors for circular layout, handled by cetz internally?
     // anchors.insert(name, "state." + repr(-ang))
 
     at += 2 * state-radius + spacing
