@@ -8,3 +8,47 @@
   state((0, 0), "q0", final: true)
   state((2, 2), "q1", final: true, stroke: red)
 })
+
+
+#let aut = finite.create-automaton((
+  q0: (q1: 1),
+  q1: (q0: 0),
+))
+#assert(aut.final == ("q1",))
+
+
+#let aut = finite.create-automaton(
+  (
+    q0: (q1: 1),
+    q1: (q0: 0),
+  ),
+  final: "q0",
+)
+#assert(aut.final == ("q0",))
+
+#let aut = finite.create-automaton(
+  (
+    q0: (q1: 1),
+    q1: (q0: 0),
+  ),
+  final: ("q0",),
+)
+#assert(aut.final == ("q0",))
+
+#let aut = finite.create-automaton(
+  (
+    q0: (q1: 1),
+    q1: (q0: 0),
+  ),
+  final: ("q0", "q1"),
+)
+#assert(aut.final == ("q0", "q1"))
+
+#let aut = finite.create-automaton(
+  (
+    q0: (q1: 1),
+    q1: (q0: 0),
+  ),
+  final: none,
+)
+#assert(aut.final == ())

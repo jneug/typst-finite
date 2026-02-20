@@ -35,7 +35,7 @@
   initial: auto,
   /// The list of final states. #typ.v.auto uses the last
   /// key in #arg[spec].
-  /// -> array
+  /// -> string | array | auto | none
   final: auto,
   /// The list of all inputs, the automaton uses. #typ.v.auto
   /// uses the inputs provided in #arg[spec].
@@ -117,7 +117,7 @@
     } else if util.is-none(final) {
       final = ()
     }
-    spec.insert("final", final)
+    spec.insert("final", util.def.as-arr(final))
   }
 
   if "inputs" not in spec {
