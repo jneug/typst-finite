@@ -328,7 +328,7 @@
       for (kk, vv) in values {
         for i in def.as-arr(vv) {
           if not-none(i) {
-            i = str(i)
+            i = get.text(i)
             if i not in new-values {
               new-values.insert(i, (kk,))
             } else {
@@ -345,30 +345,59 @@
   return ttable
 }
 
-/// Gets a list of all inputs from a transition table.
-///
+
+/// Returns a list of unique states referenced in a transition table.
+/// States are either keys in #arg[table]
+/// or referenced in a transition.
+#let get-states(table) = {
+  let states = table.keys() + table.values().filter(not-none).map(d => d.keys()).flatten()
+  return states.dedup()
+}
+
+#let get-input-str(input) = {
+  return get.text(input)
+}
+
+/// Creates a tuple of (#typ.t.arr, #typ.t.dict).
+/// The array is the set of unique input strings for
+/// an automaton and the dictionary is a mapping of
+/// input strings to labels.
+/// -> array
 #let get-inputs(
-  /// A transition table.
-  /// -> transition-table
   table,
-  /// If #arg[table] needs to be transposed first. Set this to #typ.v.false if the table already is in the format (`input`: `states`).
-  /// -> bool
-  transpose: true,
+  input-labels: (:),
 ) = {
-  if transpose {
-    table = transpose-table(table)
+  let label-transform = if is-func(input-labels) {
+    (i, l) => input-labels(i)
+  } else if is-dict(input-labels) {
+    (i, l) => input-labels.at(i, default: l)
+  } else {
+    (i, l) => none
   }
 
-  let inputs = ()
-  for (_, values) in table {
-    for (inp, _) in values {
-      if inp not in inputs {
-        inputs.push(str(inp))
+  let (inputs, labels) = ((), (:))
+  for transitions in table.values() {
+    if is-dict(transitions) {
+      for input in transitions.values().filter(not-none).flatten() {
+        let input-str = get-input-str(input)
+        let input-label = none
+
+        if is-content(input) {
+          input-label = input
+        }
+
+        input-label = label-transform(input-str, input-label)
+
+        inputs.push(input-str)
+        if not-none(input-label) and input-str not in labels {
+          labels.insert(input-str, input-label)
+        }
       }
     }
   }
+  inputs = inputs.dedup().sorted()
 
-  return inputs.sorted()
+  return (inputs, labels)
 }
 
 

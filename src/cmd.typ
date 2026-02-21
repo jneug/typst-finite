@@ -40,66 +40,57 @@
   /// The list of all inputs, the automaton uses. #typ.v.auto
   /// uses the inputs provided in #arg[spec].
   inputs: auto,
-  // TODO: allow arbitrary input labels
-  // labels: (:),
-  // TODO: Allow function for labels
+  /// A dictionary with custom labels for states and transitions or a #typ.t.function that generates them.
+  /// -> dictionary | function
+  labels: (:),
+  /// A dictionary with custom labels for inputs.
+  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// -> dictionary | function
   input-labels: (:),
 ) = {
-  // TODO: (jneug) add asserts to react to malicious specs
   util.assert.any-type(dictionary, spec)
 
-  // TODO: (jneug) check for duplicate names
+  // fast fail, if already a spec
+  if spec.at("finite-spec", default: false) {
+    return spec
+  }
+
+  // If spec has no transitions key, we assume it
+  // is a transition table itself.
   if "transitions" not in spec {
     spec = (transitions: spec)
   }
+
+  // Get all inputs and input-labels
+  let (inputs, input-labels) = util.get-inputs(spec.transitions, input-labels: input-labels)
+
+  spec.insert("inputs", inputs)
+  spec.insert("input-labels", input-labels)
 
   // Make sure transition inputs are string arrays
   for (state, trans) in spec.transitions {
     if util.is-empty(trans) {
       trans = (:)
     }
-    for (s, inputs) in trans {
-      if inputs == none {
-        trans.at(s) = ()
-      } else if type(inputs) != array {
-        trans.at(s) = (inputs,)
-      }
 
-      for (i, input) in trans.at(s).enumerate() {
-        let input-str = util.get.text(input)
-        if type(input) == content {
-          input-labels.insert(input-str, input)
-        }
-        trans.at(s).at(i) = input-str
-      }
+    for (s, inputs) in trans {
+      inputs = util.def.if-none(
+        inputs,
+        def: (),
+        do: util.def.as-arr,
+      )
+
+      trans.at(s) = inputs.map(util.get-input-str)
     }
+
     spec.transitions.at(state) = trans
   }
 
-  // TODO (jneug) validate given states with transitions
   if "states" not in spec {
-    spec.insert(
-      "states",
-      util.def.if-auto(
-        states,
-        def: spec
-          .transitions
-          .pairs()
-          .fold(
-            (),
-            (
-              a,
-              (s, t),
-            ) => {
-              a.push(s)
-              return a + t.keys()
-            },
-          )
-          .dedup(),
-      ),
-    )
+    spec.insert("states", util.get-states(spec.transitions))
   }
 
+  // Insert initial state
   if "initial" not in spec {
     spec.insert(
       "initial",
@@ -113,33 +104,40 @@
   // Insert final state
   if "final" not in spec {
     if util.is-auto(final) {
-      final = (spec.transitions.keys().last(),)
+      final = spec.transitions.keys().last()
     } else if util.is-none(final) {
       final = ()
     }
     spec.insert("final", util.def.as-arr(final))
   }
 
-  if "inputs" not in spec {
-    if util.is-auto(inputs) {
-      inputs = util.get-inputs(spec.transitions)
-    }
-    spec.insert("inputs", inputs)
-  } else {
-    spec.inputs = spec.inputs.map(str).sorted()
+  // add state / transition labels
+  if util.is-func(labels) {
+    // build label map from label function
+    labels = (spec.states + spec.transitions.keys()).fold(
+      (:),
+      (map, id) => {
+        let l = labels(id)
+        if util.not-none(l) {
+          map.insert(id, l)
+        }
+        map
+      },
+    )
   }
-
-  if "input-labels" in spec {
-    input-labels += spec.input-labels
+  if "labels" in spec {
+    labels += spec.labels
   }
-  spec.insert("input-labels", input-labels)
+  spec.insert("labels", labels)
 
+  // add type identifier
   if util.is-dea(spec.transitions) {
     spec.insert("type", "DEA")
   } else {
     spec.insert("type", "NEA")
   }
 
+  // mark as parsed spec-dictionary
   return spec + (finite-spec: true)
 }
 
@@ -188,10 +186,23 @@
   ///     )
   ///   )
   ///   ```]
-  /// -> dictionary
+  /// May be a function that gets the state or transition name and returns a computed
+  /// label. If #typ.none is returned, the name is not put into the label map.
+  /// -> dictionary | function
   labels: (:),
   /// A dictionary with custom labels for inputs.
   /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:"e"), q1: (q2:"l")),
+  ///     input-labels: (
+  ///       e: $epsilon$,
+  ///       l: $lambda$
+  ///     )
+  ///   )
+  ///   ```]
+  /// May be a function that gets the input as a #typ.t.str and returns a computed
+  /// label. If #typ.none is returned, the input is not put into the label map.
   /// -> dictionary | function
   input-labels: (:),
   /// A dictionary with styles for states and transitions.
@@ -240,12 +251,7 @@
   /// -> any
   ..canvas-styles,
 ) = {
-  spec = create-automaton(spec, initial: initial, final: final)
-  if util.is-dict(input-labels) {
-    spec.input-labels += input-labels
-  } else {
-    spec.input-labels = spec.inputs.map(i => (i, input-labels(i))).to-dict()
-  }
+  spec = create-automaton(spec, initial: initial, final: final, labels: labels, input-labels: input-labels)
 
   // use a dict with coordinates as custom layout
   if util.is-dict(layout) {
@@ -267,7 +273,7 @@
         state(
           coordinates.at(name, default: ()),
           name,
-          label: labels.at(name, default: state-format(name)),
+          label: spec.labels.at(name, default: state-format(name)),
           initial: (name == spec.initial),
           final: (name in spec.final),
           anchor: anchors.at(name, default: none),
@@ -285,7 +291,7 @@
             let inputs-labeled = inputs.map(i => spec.input-labels.at(i, default: i))
 
             // prepare label
-            let label = labels.at(
+            let label = spec.labels.at(
               name,
               default: input-format(inputs-labeled),
             )
@@ -342,6 +348,35 @@
   /// A list of final state names. For #value(auto), the last state in #arg[states] is used.
   /// -> array, auto, none
   final: auto,
+  /// A dictionary with custom labels for states and transitions.
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:none), q1: (q2:none), q2: none),
+  ///     labels: (
+  ///       q0: [START], q1: $lambda$, q2: [END],
+  ///       q0-q1: $delta$
+  ///     )
+  ///   )
+  ///   ```]
+  /// May be a function that gets the state or transition name and returns a computed
+  /// label. If #typ.none is returned, the name is not put into the label map.
+  /// -> dictionary | function
+  labels: (:),
+  /// A dictionary with custom labels for inputs.
+  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  ///   #example[```
+  ///   #finite.automaton(
+  ///     (q0: (q1:"e"), q1: (q2:"l")),
+  ///     input-labels: (
+  ///       e: $epsilon$,
+  ///       l: $lambda$
+  ///     )
+  ///   )
+  ///   ```]
+  /// May be a function that gets the input as a #typ.t.str and returns a computed
+  /// label. If #typ.none is returned, the input is not put into the label map.
+  /// -> dictionary | function
+  input-labels: (:),
   /// A function to format the value in a table cell. The function takes a column and row index and the cell content
   /// as a #typ.t.str and generates content: #lambda("int", "int", "str", ret:"content").
   ///   #example[```
@@ -370,20 +405,11 @@
   ///   ```]
   /// -> function
   format-list: states => states.join(", "),
-  /// A dictionary with custom labels for inputs.
-  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
-  /// -> dictionary | function
-  input-labels: raw,
   /// Arguments for #typ.table.
   /// -> any
   ..table-style,
 ) = {
-  spec = create-automaton(spec, initial: initial, final: final)
-  if util.is-dict(input-labels) {
-    spec.input-labels += input-labels
-  } else {
-    spec.input-labels = spec.inputs.map(i => (i, input-labels(i))).to-dict()
-  }
+  spec = create-automaton(spec, initial: initial, final: final, labels: labels, input-labels: input-labels)
 
   let table-cnt = (
     format(0, 0, ""),
@@ -393,7 +419,7 @@
   }
 
   for (row, (state, transitions)) in spec.transitions.pairs().enumerate() {
-    table-cnt.push(format(0, row + 1, state))
+    table-cnt.push(format(0, row + 1, spec.labels.at(state, default: state)))
     if util.is-dict(transitions) {
       for (i, char) in spec.inputs.enumerate() {
         let to = ()
@@ -401,7 +427,7 @@
           if util.is-str(label) {
             label = label.split(",")
           }
-          label = util.def.as-arr(label).map(str)
+          label = util.def.as-arr(label)
 
           if char in label {
             to.push(name)
@@ -522,6 +548,9 @@
   /// Name for the new trap-state.
   /// -> str
   trap-name: "TRAP",
+  /// Label for the new trap-state.
+  /// -> str
+  trap-label: none,
 ) = {
   spec = create-automaton(spec)
 
@@ -550,12 +579,18 @@
       ),
     )
     spec.states.push(trap-name)
+
+    if util.not-none(trap-label) {
+      spec.labels.insert(trap-name, trap-label)
+    }
   }
 
   spec.at("transitions") = util.transpose-table(table)
   return spec
 }
 
+
+// TODO: Make all format functions accept the automaton spec for more flexibility
 
 /// Tests if #arg[word] is accepted by a given automaton.
 ///
@@ -586,8 +621,11 @@
   /// -> function
   format: (spec, states) => states
     .map(((s, i)) => if i != none [
-      #s #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, raw(i))]]
-    ] else [#s])
+      #spec.labels.at(s, default: s) #box[#sym.arrow.r#place(top + center, dy: -88%)[#text(.88em, spec.input-labels.at(
+          i,
+          default: raw(i),
+        ))]]
+    ] else [#spec.labels.at(s, default: s)])
     .join(),
 ) = {
   spec = create-automaton(spec)
