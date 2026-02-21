@@ -358,7 +358,7 @@
   ///   )
   ///   ```]
   /// -> function
-  format: (col, row, v) => raw(str(v)),
+  format: (col, row, v) => [#v],
   /// Formats a list of states for display in a table cell. The function takes an array of state names and generates a string to be passed to @cmd:transition-table.format:
   /// #lambda("array", ret:"str")
   ///   #example[```
@@ -370,17 +370,26 @@
   ///   ```]
   /// -> function
   format-list: states => states.join(", "),
+  /// A dictionary with custom labels for inputs.
+  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// -> dictionary | function
+  input-labels: raw,
   /// Arguments for #typ.table.
   /// -> any
   ..table-style,
 ) = {
   spec = create-automaton(spec, initial: initial, final: final)
+  if util.is-dict(input-labels) {
+    spec.input-labels += input-labels
+  } else {
+    spec.input-labels = spec.inputs.map(i => (i, input-labels(i))).to-dict()
+  }
 
   let table-cnt = (
     format(0, 0, ""),
   )
   for (col, input) in spec.inputs.enumerate() {
-    table-cnt.push(format(col + 1, 0, input))
+    table-cnt.push(format(col + 1, 0, spec.input-labels.at(input, default: input)))
   }
 
   for (row, (state, transitions)) in spec.transitions.pairs().enumerate() {
@@ -590,9 +599,13 @@
   )
   transitions = util.transpose-table(transitions)
 
+  if final == () {
+    // No final state, all words rejected
+    return false
+  }
+
   util.assert.that(transitions != (:), message: "Transitions may not be empty.")
   util.assert.that(initial != none, message: "Initial state must be given.")
-  util.assert.that(final != (), message: "Final state must be given.")
 
   let next-symbol(word, inputs) = {
     for sym in inputs {
