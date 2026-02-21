@@ -329,10 +329,7 @@
             if style.label.fill != none {
               label-style.insert("fill", style.label.fill)
             }
-            set text(
-              size: style.label.size,
-              fill: style.label.fill,
-            )
+            set text(..label-style)
             style.label.text
           },
         )

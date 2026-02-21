@@ -114,8 +114,10 @@
     ("none": 0, "center": 0, "left": -1, "right": 1).at(repr(a.x)),
     ("none": 0, "horizon": 0, "top": 1, "bottom": -1).at(repr(a.y)),
   )
-
-  return cetz.vector.norm(v)
+  if v != (0, 0) {
+    v = cetz.vector.norm(v)
+  }
+  return v
 }
 
 #let vec-to-align(vec) = {
@@ -123,7 +125,7 @@
 
   let angle = cetz.vector.angle2((0, 0), vec) / 1deg
   if angle < 0 { angle = angle + 360 }
-  let idx = calc.round((angle - 22.5) / 45 + .5)
+  let idx = calc.rem(calc.round((angle - 22.5) / 45 + .5), 8)
 
   return (
     right,
@@ -444,18 +446,9 @@
   return ang >= lower and ang <= upper
 }
 
-
-// Resolve radii for states by applying styles from other elements.
-#let resolve-radii(ctx, body) = {
-  let (_, elements) = resolve-many(ctx, body)
-  return get-radii(elements)
-}
-
-
 #let get-radii(spec, style: (:)) = spec.states.fold(
   (:),
   (d, name) => {
-    let r = style.at(name, default: (:)).at("radius", default: none)
     d.insert(
       name,
       style
