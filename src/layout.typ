@@ -474,14 +474,14 @@
 }
 
 
-#let diagraph-layout(
+#let diagraph(
   /// Automaton specification.
   /// -> spec
   spec,
   /// Layoutengine to use. See diagraph documentation.
   /// -> string
-  engine: "dot",
-  scale: 10,
+  engine: "neato",
+  scale: 15,
   /// Position of the anchor point.
   /// -> coordinate
   position: (0, 0),
@@ -508,9 +508,17 @@
     },
   )
 
+  let styles = (:)
+
   let coords = (:)
   for node in graph.nodes {
-    coords.insert(node.name, (node.x / 1pt / scale, node.y / 1pt / scale))
+    coords.insert(
+      node.name,
+      (
+        position.at(0) + node.x / 1pt / scale,
+        position.at(1) + node.y / 1pt / scale,
+      ),
+    )
   }
 
   return create-layout(positions: coords)
