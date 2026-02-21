@@ -15,7 +15,7 @@
 ///
 /// -> array
 #let state(
-  /// Position of the states center.
+  /// Position of the state's center.
   /// -> coordinate
   position,
   /// Name for the state.

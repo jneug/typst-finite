@@ -44,7 +44,7 @@
   /// -> dictionary | function
   labels: (:),
   /// A dictionary with custom labels for inputs.
-  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// Using this, inputs can be labeled with arbitrary content instead of strings or numbers.
   /// -> dictionary | function
   input-labels: (:),
 ) = {
@@ -191,7 +191,7 @@
   /// -> dictionary | function
   labels: (:),
   /// A dictionary with custom labels for inputs.
-  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// Using this, inputs can be labeled with arbitrary content instead of strings or numbers.
   ///   #example[```
   ///   #finite.automaton(
   ///     (q0: (q1:"e"), q1: (q2:"l")),
@@ -206,10 +206,10 @@
   /// -> dictionary | function
   input-labels: (:),
   /// A dictionary with styles for states and transitions.
-  /// -> dictionary
+  /// -> dictionary | function
   style: (:),
   /// A function #lambda("string", ret:"content") to format state labels.
-  ///    The function will get the states name as a string and should return the final label as #dtype("content").
+  ///    The function will get the state's name as a string and should return the final label as #dtype("content").
   ///   #example[```
   ///   #finite.automaton(
   ///     (q0: (q1:none), q1: none),
@@ -226,7 +226,7 @@
     }
   },
   /// A function #lambda("array", ret:"content")
-  ///   to generate transition labels from input values. The functions will be
+  ///   to generate transition labels from input values. The function will be
   ///   called with the array of inputs and should return the final label for
   ///   the transition. This is only necessary, if no label is specified.
   ///   #example[```
@@ -363,7 +363,7 @@
   /// -> dictionary | function
   labels: (:),
   /// A dictionary with custom labels for inputs.
-  /// Using this, inputs can be labeled with arbitrary content intead of strings or numbers.
+  /// Using this, inputs can be labeled with arbitrary content instead of strings or numbers.
   ///   #example[```
   ///   #finite.automaton(
   ///     (q0: (q1:"e"), q1: (q2:"l")),
@@ -594,7 +594,7 @@
 
 /// Tests if #arg[word] is accepted by a given automaton.
 ///
-/// The result if either #value(false) or an array of tuples
+/// The result is either #value(false) or an array of tuples
 /// with a state name and the input used to transition to the
 /// next state. The array is a possible path to an accepting
 /// final state. The last tuple always has #value(none) as

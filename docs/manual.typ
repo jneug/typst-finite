@@ -155,7 +155,7 @@ See @using-layout for more on layouts.
 
 == Specifying finite automata <aut-specs>
 
-Most of FINITEs commands expect a finite automaton specification ("@type:spec" in short) as the first argument. These specifications are dictionaries defining the elements of the automaton.
+Most of FINITE's commands expect a finite automaton specification ("@type:spec" in short) as the first argument. These specifications are dictionaries defining the elements of the automaton.
 
 If an automaton has only one final state, the spec can simply be a @type:transition-table. In other cases, the specification can explicitly define the various elements.
 
@@ -178,7 +178,9 @@ A specification (@type:spec) is composed of these keys:
   states: (...),
   inputs: (...),
   initial: "...",
-  final: (...)
+  final: (...),
+  labels: (...),
+  input-labels: (...)
 )
 ```
 
@@ -194,17 +196,39 @@ A specification (@type:spec) is composed of these keys:
 - `inputs` is an optional array with all input values. The inputs found in `transitions` are used by default.
 - `initial` is an optional name of the initial state. The first value in `states` is used by default.
 - `final` is an optional array of final states. The last value in `states` is used by default.
+- `labels` is a dictionary mapping state and transition names to display labels. An empty dictionary by default.
+- `input-labels` is a dictionary mapping input strings to display content. An empty dictionary by default. Inputs that are themselves content values are automatically added here.
 
 The utility function #cmd(module: "util")[create-automaton] can be used to create a full spec from a partial dictionary by filling in the missing values with the defaults.
+
+=== Input labels <input-labels>
+
+By default, transition labels use the raw input strings or numbers from the transition table. The #arg[input-labels] parameter of #cmd[automaton] (and #cmd[create-automaton]) lets you map those raw inputs to arbitrary content — useful for Greek letters, mathematical symbols, or any formatted text.
+
+#example[```typ
+#automaton(
+  (q0: (q1: "e"), q1: (q2: "l"), q2: none),
+  input-labels: (
+    e: $epsilon$,
+    l: $lambda$,
+  )
+)
+```]
+
+Input labels are stored in the spec under the `input-labels` key and are used both in transition diagrams and in #cmd[transition-table] column headers. Inputs that are themselves content values (rather than strings or numbers) are automatically recorded as their own labels.
+
+#info-alert[
+  Input labels affect display only. The raw input strings (e.g. `"e"`, `"l"`) are still used internally by #cmd[accepts] and other simulation functions.
+]
 
 == Command reference
 #show-module("cmd", sort-functions: false)
 
 == Styling the output
 
-As common in CETZ, you can pass general styles for states and transitions to the #cetz-cmd-[set-style] function within a call to #cetz-cmd-[canvas]. The elements functions #cmd-[state] and #cmd-[transition] (see below) can take their respective styling options as arguments to style individual elements.
+As common in CETZ, you can pass general styles for states and transitions to the #cetz-cmd-[set-style] function within a call to #cetz-cmd-[canvas]. The element functions #cmd-[state] and #cmd-[transition] (see below) can take their respective styling options as arguments to style individual elements.
 
-#cmd[automaton] takes a #arg[style] argument that passes the given style to the above functions. The example below sets a background and stroke color for all states and draws transitions with a dashed style. Additionally, the state `q1` has the arrow indicating an initial state drawn from above instead from the left. The transition from `q1` to `q2` is highlighted in red.
+#cmd[automaton] takes a #arg[style] argument that passes the given style to the above functions. The example below sets a background and stroke color for all states and draws transitions with a dashed style. Additionally, the state `q1` has the arrow indicating an initial state drawn from above instead of from the left. The transition from `q1` to `q2` is highlighted in red.
 #example(breakable: true)[```typ
 #automaton(
   (
@@ -233,7 +257,7 @@ The supported styling options (and their defaults) are as follows:
   / #arg(extrude: .88):
   - `label`:
     / #arg(text: auto): State label.
-    / #arg(size: 1em): Initial text size for the labels (will be modified to fit the label into the states circle).
+    / #arg(size: 1em): Initial text size for the labels (will be modified to fit the label into the state's circle).
     / #arg(fill: none): Color of the label text.
     / #arg(padding: auto): Padding around the label.
   - `initial`:
@@ -247,7 +271,7 @@ The supported styling options (and their defaults) are as follows:
   - `label`:
     / #arg(text: ""): Transition label.
     / #arg(size: 1em): Size for label text.
-    / #arg(fill: auto): Color for label text.
+    / #arg(fill: none): Color for label text. When set to #value(none), the color is inherited from the transition's stroke color.
     / #arg(
         pos: .5,
       ): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the start, #value(1) at the end of the transition.
@@ -280,10 +304,10 @@ The above commands use custom CETZ elements to draw states and transitions. For 
 
 === Anchors
 
-States and transitions are created in a #cetz-draw[group]. States are drawn with a circle named `state` that can be referenced in the group. Additionally they have a content element named `label` and optionally a line named `initial`. These elements can be referenced inside the group and used as anchors for other CETZ elements. The anchors of `state` are also copied to the state group and are directly accessible.
+States and transitions are created in a #cetz-draw[group]. States are drawn with a circle named `state` that can be referenced in the group. Additionally, they have a content element named `label` and optionally a line named `initial`. These elements can be referenced inside the group and used as anchors for other CETZ elements. The anchors of `state` are also copied to the state group and are directly accessible.
 
 #info-alert[
-  That means setting #arg(anchor: "west") for a state will anchor the state at the `west` anchor of the states circle, not of the bounding box of the group.
+  That means setting #arg(anchor: "west") for a state will anchor the state at the `west` anchor of the state's circle, not of the bounding box of the group.
 ]
 
 Transitions have an `arrow` (#cetz-draw[line]) and `label` (#cetz-draw[content]) element. The anchors of `arrow` are copied to the group.
@@ -336,6 +360,48 @@ Layouts can be passed to @cmd:automaton to position states on the canvas without
 
 FINITE has a set of functions to simulate, test and view finite automata.
 
+== Testing word acceptance <simulating-accepts>
+
+The #cmd[accepts] function tests whether a given word is accepted by an automaton. It takes a @type:spec or @type:transition-table as its first argument and a word as a #typ.t.str.
+
+If the word is rejected, #cmd[accepts] returns #value(false). If accepted, it returns formatted content showing the path of states and transitions that led to acceptance.
+
+#example[```typ
+#let aut = (
+  q0: (q1: "0"),
+  q1: (q1: "0", q2: "1"),
+  q2: none
+)
+
+Accepted: #finite.accepts(aut, "01")
+
+Rejected: #repr(finite.accepts(aut, "10"))
+```]
+
+If the automaton has no final states, #cmd[accepts] returns #value(false) for every word without an error.
+
+#example[```typ
+#let no-final = finite.create-automaton(
+  (q0: (q0: "0", q1: "1"), q1: (q0: "1", q1: "0")),
+  final: none
+)
+#repr(finite.accepts(no-final, "01"))
+```]
+
+The output of #cmd[accepts] uses the `input-labels` stored in the spec for display. To see labels in the acceptance path, first build a spec with #cmd[create-automaton] and the #arg[input-labels] parameter:
+
+#example[```typ
+#let spec = finite.create-automaton(
+  (q0: (q1: "e"), q1: (q2: "l"), q2: none),
+  input-labels: (e: $epsilon$, l: $lambda$)
+)
+#finite.accepts(spec, "el")
+```]
+
+#info-alert[
+  The #arg[word] argument of #cmd[accepts] is always a plain #typ.t.str using the raw input keys (e.g. `"e"`, `"l"`), not the display labels.
+]
+
 = FLACI support
 
 FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"). FLACI lets you build automata in a visual online app and export your creations as JSON files. FINITE can import these files and render the result in your document.
@@ -351,7 +417,7 @@ FINITE was heavily inspired by the online app #link("https://flaci.org", "FLACI"
 #warning-alert[
   *Important* \
   Read the FLACI json-file with the #typ.read function, not
-  the #typ.json function. FLACI exports automatons with a wrong encoding
+  the #typ.json function. FLACI exports automata with a wrong encoding
   that prevents Typst from properly loading the file as JSON.
 ]
 

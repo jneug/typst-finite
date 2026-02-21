@@ -1,3 +1,4 @@
+#import "_deps.typ": dia
 #import "util.typ"
 #import util: assert-dict, assert-spec, cetz, default-style, test
 
@@ -34,7 +35,7 @@
   spec,
   /// A dictionary with #dtype("coordinate")s for each state.
   ///
-  /// The dictionary contains each states name as a
+  /// The dictionary contains each state's name as a
   /// key and the new coordinate as a value.
   ///
   /// -> dictionary
@@ -69,7 +70,7 @@
 /// Arrange states in a line.
 ///
 /// The direction of the line can be set via #arg[dir] either to an #typ.t.alignment
-/// or a direction vector with a x and y shift. Note that the length of the vector is set to #arg[spacing] and only the direction is used.
+/// or a direction vector with an x and y shift. Note that the length of the vector is set to #arg[spacing] and only the direction is used.
 ///
 /// #example(breakable:true)[```
 /// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), none); d})
@@ -183,7 +184,7 @@
   /// Direction of the circle. Either #value(left) or #value(right).
   /// -> alignment
   dir: right,
-  /// Spacing between states on the line.
+  /// Spacing between states on the circle.
   /// -> float
   spacing: default-style.state.radius * 2,
   /// Either a fixed radius or #typ.v.auto to calculate a suitable radius.
@@ -328,7 +329,7 @@
   /// Number of columns per row.
   /// -> int
   columns: 4,
-  /// Spacing between states on the line.
+  /// Spacing between states in the grid.
   /// -> float
   spacing: default-style.state.radius * 2,
   /// Position of the anchor point.
@@ -409,7 +410,7 @@
   /// states (by name) are in each group.
   /// -> int | array
   grouping: auto,
-  /// Spacing between states on the line.
+  /// Spacing between groups.
   /// -> float
   spacing: default-style.state.radius * 2,
   /// An array of layouts to use for each group. The first group of
@@ -478,7 +479,7 @@
   /// Automaton specification.
   /// -> spec
   spec,
-  /// Layoutengine to use. See diagraph documentation.
+  /// Layout engine to use. See diagraph documentation.
   /// -> string
   engine: "neato",
   scale: 15,

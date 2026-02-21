@@ -3,7 +3,7 @@
 ### Version 0.5.1
 - Inputs can now be arbitrary content or have a content label assigned (#1)
 - State, transition and input labels are now part of the automaton spec.
-- Fixed individual loop styles being overriden by global styles (by @hxjerry)
+- Fixed individual loop styles being overridden by global styles (by @hxjerry)
 - Documentation improvements (thanks @CSharperMantle) (#23)
 - Fixes loop bug in transitions with `curve: -1` (#17)
 - Fixed some bugs in utility functions.
@@ -13,7 +13,7 @@
 ### Version 0.5.0
 
 - :warning: New layout system:
-	- Layouts are no longer CeTZ groups and only are used as a parameter to `#automaton`.
+	- Layouts are no longer CeTZ groups and are only used as a parameter to `#automaton`.
 - :warning: Breaking style changes:
 	- Changed label color attribute from `color` to `fill` for consistency.
 	- The default for `state.label.fill` and `transition.label.fill` is now `none` and sets the color of the label to `stroke.paint`.
@@ -55,7 +55,7 @@
 - Introducing automaton specs as a data structure.
 - Changes to `automaton` command:
 	- Changed `label-format` argument to `state-format` and `input-format`.
-	- `layout` can now take a dictionary with (`state`: `coordinate`)  pairs to position states.
+	- `layout` can now take a dictionary with (`state`: `coordinate`) pairs to position states.
 - Added `#powerset` command, to transform an NFA into a DFA.
 - Added `#add-trap` command, to complete a partial DFA.
 - Added `#accepts` command, to test a word against an NFA or DFA.

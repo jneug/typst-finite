@@ -1,7 +1,6 @@
+#import "_deps.typ": cetz, t4t
+#import t4t: *
 
-// Package dependencies
-#import "@preview/t4t:0.4.3": *
-#import "@preview/cetz:0.4.2"
 
 // TODO: (jneug) implement scheme validation with valkyrie
 // #import "@preview/valkyrie:0.2.1" as t
@@ -59,7 +58,15 @@
 // =================================
 
 /// Calls #arg[value] with #sarg[args], if it is a #dtype("function") and returns the result or #arg[value] otherwise.
-#let call-or-get(value, ..args) = {
+/// -> any
+#let call-or-get(
+  /// Value to call or return.
+  /// -> any
+  value,
+  /// Arguments to pass if #arg[value] is a function.
+  /// -> arguments
+  ..args,
+) = {
   if is-func(value) {
     return value(..args)
   } else {
@@ -89,18 +96,39 @@
 // =================================
 
 /// Set the length of a cetz.vector.
-#let vector-set-len(v, len) = if cetz.vector.len(v) == 0 {
+/// -> vector
+#let vector-set-len(
+  /// The vector.
+  /// -> vector
+  v,
+  /// The new length.
+  /// -> float
+  len,
+) = if cetz.vector.len(v) == 0 {
   return v
 } else {
   return cetz.vector.scale(cetz.vector.norm(v), len)
 }
 
-/// Compute a normal for a 2d cetz.vector. The normal will be pointing to the right
+/// Compute a normal for a 2D cetz.vector. The normal will be pointing to the right
 /// of the original cetz.vector.
-#let vector-normal(v) = cetz.vector.norm((-v.at(1), v.at(0), 0))
+/// -> vector
+#let vector-normal(
+  /// The vector to compute the normal for.
+  /// -> vector
+  v,
+) = cetz.vector.norm((-v.at(1), v.at(0), 0))
 
-/// Rotates a vector by #arg[angle] degree around the origin.
-#let vector-rotate(vec, angle) = {
+/// Rotates a vector by #arg[angle] degrees around the origin.
+/// -> vector
+#let vector-rotate(
+  /// The vector to rotate.
+  /// -> vector
+  vec,
+  /// The angle to rotate by.
+  /// -> angle
+  angle,
+) = {
   let (x, y, ..) = vec
   return (
     calc.cos(angle) * x - calc.sin(angle) * y,
@@ -109,7 +137,12 @@
 }
 
 /// Returns a vector for an alignment.
-#let align-to-vec(a) = {
+/// -> vector
+#let align-to-vec(
+  /// The alignment to convert.
+  /// -> alignment
+  a,
+) = {
   let v = (
     ("none": 0, "center": 0, "left": -1, "right": 1).at(repr(a.x)),
     ("none": 0, "horizon": 0, "top": 1, "bottom": -1).at(repr(a.y)),
@@ -145,7 +178,24 @@
 // =================================
 
 /// Compute a normal vector for a point on a cubic bezier curve.
-#let cubic-normal(a, b, c, d, t) = {
+/// -> vector
+#let cubic-normal(
+  /// Start point.
+  /// -> vector
+  a,
+  /// End point.
+  /// -> vector
+  b,
+  /// First control point.
+  /// -> vector
+  c,
+  /// Second control point.
+  /// -> vector
+  d,
+  /// Parameter value between #value(0) and #value(1).
+  /// -> float
+  t,
+) = {
   let qd = cubic-derivative(a, b, c, d, t)
   if cetz.vector.len(qd) == 0 {
     return (0, 1, 0)
@@ -154,16 +204,41 @@
   }
 }
 
-/// Compute the mid point of a quadratic bezier curve.
-#let mid-point(a, b, c, d) = cubic-point(a, b, c, d, .5)
+/// Compute the midpoint of a cubic bezier curve.
+/// -> vector
+#let mid-point(
+  /// Start point.
+  /// -> vector
+  a,
+  /// End point.
+  /// -> vector
+  b,
+  /// First control point.
+  /// -> vector
+  c,
+  /// Second control point.
+  /// -> vector
+  d,
+) = cubic-point(a, b, c, d, .5)
 
 
 // =================================
 //  Helpers
 // =================================
 
-/// Calculate the control point for a transition.
-#let cubic-pts(a, b, curve: 1) = {
+/// Calculate the control points for a transition bezier curve.
+/// -> array
+#let cubic-pts(
+  /// Start point.
+  /// -> vector
+  a,
+  /// End point.
+  /// -> vector
+  b,
+  /// Curvature factor.
+  /// -> float
+  curve: 1,
+) = {
   if curve == 0 {
     return (a, b, b, a)
   }
@@ -181,12 +256,49 @@
   return cubic-through-3points(a, X, b)
 }
 
-/// Calculate the direction vector for a transition mark (arrowhead)
-#let mark-dir(a, b, c, d, scale: 1) = vector-set-len(cubic-derivative(a, b, c, d, 1), scale)
+/// Calculate the direction vector for a transition mark (arrowhead).
+/// -> vector
+#let mark-dir(
+  /// Start point.
+  /// -> vector
+  a,
+  /// End point.
+  /// -> vector
+  b,
+  /// First control point.
+  /// -> vector
+  c,
+  /// Second control point.
+  /// -> vector
+  d,
+  /// Scale for the resulting direction vector.
+  /// -> float
+  scale: 1,
+) = vector-set-len(cubic-derivative(a, b, c, d, 1), scale)
 
-/// Calculate the location for a transitions label, based
+/// Calculate the location for a transition's label, based
 /// on its bezier points.
-#let label-pt(a, b, c, d, style, loop: false) = {
+/// -> vector
+#let label-pt(
+  /// Start point.
+  /// -> vector
+  a,
+  /// End point.
+  /// -> vector
+  b,
+  /// First control point.
+  /// -> vector
+  c,
+  /// Second control point.
+  /// -> vector
+  d,
+  /// Resolved style dictionary with `label` and `curve` keys.
+  /// -> dictionary
+  style,
+  /// Whether the transition is a loop.
+  /// -> bool
+  loop: false,
+) = {
   let pos = style.label.pos // style.label.at("pos", default: default-style.transition.label.pos)
   let dist = style.label.dist // style.label.at("dist", default: default-style.transition.label.dist)
   let curve = style.curve // style.at("curve", default: default-style.transition.curve)
@@ -207,11 +319,21 @@
 
 /// Calculate start, end and ctrl points for a transition loop.
 ///
-/// - start (vector): Center of the state.
-/// - start-radius (length): Radius of the state.
-/// - curve (float): Curvature of the transition.
-/// - anchor (alignment): Anchorpoint on the state
-#let loop-pts(start, start-radius, anchor: top, curve: 1) = {
+/// -> array
+#let loop-pts(
+  /// Center of the state.
+  /// -> vector
+  start,
+  /// Radius of the state.
+  /// -> float
+  start-radius,
+  /// Anchor point on the state.
+  /// -> alignment
+  anchor: top,
+  /// Curvature of the transition.
+  /// -> float
+  curve: 1,
+) = {
   anchor = vector-set-len(align-to-vec(anchor), start-radius)
 
   let end = cetz.vector.add(
@@ -245,12 +367,27 @@
 
 /// Calculate start, end and ctrl points for a transition.
 ///
-/// - start (vector): Center of the start state.
-/// - end (vector): Center of the end state.
-/// - start-radius (length): Radius of the start state.
-/// - end-radius (length): Radius of the end state.
-/// - curve (float): Curvature of the transition.
-#let transition-pts(start, end, start-radius, end-radius, curve: 1, anchor: top) = {
+/// -> array
+#let transition-pts(
+  /// Center of the start state.
+  /// -> vector
+  start,
+  /// Center of the end state.
+  /// -> vector
+  end,
+  /// Radius of the start state.
+  /// -> float
+  start-radius,
+  /// Radius of the end state.
+  /// -> float
+  end-radius,
+  /// Curvature of the transition.
+  /// -> float
+  curve: 1,
+  /// Anchor point for loops.
+  /// -> alignment
+  anchor: top,
+) = {
   // Is it a loop?
   if start == end {
     return loop-pts(start, start-radius, curve: curve, anchor: anchor)
@@ -288,11 +425,27 @@
 
 /// Fits (text) content inside the available space.
 ///
-/// - ctx (dictionary): The canvas context.
-/// - content (string, content): The content to fit.
-/// - size (length,auto): The initial text size.
-/// - min-size (length): The minimal text size to set.
-#let fit-content(ctx, width, height, content, size: auto, min-size: 6pt) = {
+/// -> content
+#let fit-content(
+  /// The canvas context.
+  /// -> dictionary
+  ctx,
+  /// Available width.
+  /// -> float
+  width,
+  /// Available height.
+  /// -> float
+  height,
+  /// The content to fit.
+  /// -> str | content
+  content,
+  /// The initial text size.
+  /// -> length | auto
+  size: auto,
+  /// The minimal text size to use.
+  /// -> length
+  min-size: 6pt,
+) = {
   let s = def.if-auto(ctx.length, size)
 
   let m = (width: 2 * width, height: 2 * height)
@@ -349,7 +502,12 @@
 /// Returns a list of unique states referenced in a transition table.
 /// States are either keys in #arg[table]
 /// or referenced in a transition.
-#let get-states(table) = {
+/// -> array
+#let get-states(
+  /// A transition table.
+  /// -> transition-table
+  table,
+) = {
   let states = table.keys() + table.values().filter(not-none).map(d => d.keys()).flatten()
   return states.dedup()
 }
@@ -364,6 +522,8 @@
 /// input strings to labels.
 /// -> array
 #let get-inputs(
+  /// A transition table.
+  /// -> transition-table
   table,
   input-labels: (:),
 ) = {
@@ -437,7 +597,12 @@
 
 
 /// Return anchor name for an #dtype(alignment).
-#let align-to-anchor(align) = {
+/// -> str
+#let align-to-anchor(
+  /// The alignment to convert.
+  /// -> alignment
+  align,
+) = {
   let anchor = ()
   if align.y == top {
     anchor.push("north")
