@@ -5,6 +5,8 @@
 - Fixed individual loop styles being overriden by global styles (by @hxjerry)
 - Documentation improvements (thanks @CSharperMantle) (#23)
 - Fixes loop bug in transitions with `curve: -1` (#17)
+- Fixed some bugs in utility functions.
+- `#accepts` now rejects all words for automata without a final state and no longer panics.
 - Bumped CeTZ to v0.4.2
 
 ### Version 0.5.0
