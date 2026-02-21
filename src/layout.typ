@@ -472,3 +472,46 @@
 
   return create-layout(positions: positions, anchors: anchors)
 }
+
+
+#let diagraph-layout(
+  /// Automaton specification.
+  /// -> spec
+  spec,
+  /// Layoutengine to use. See diagraph documentation.
+  /// -> string
+  engine: "dot",
+  scale: 10,
+  /// Position of the anchor point.
+  /// -> coordinate
+  position: (0, 0),
+  /// Styling options.
+  /// -> dictionary
+  style: (:),
+  ..diagraph-args,
+) = {
+  import "@preview/diagraph-layout:0.0.1" as dia
+
+  let radii = util.get-radii(spec, style: style)
+
+  let graph = dia.layout-graph(
+    engine: engine,
+    directed: true,
+    ..diagraph-args.named(),
+    ..for state in spec.states {
+      (dia.node(state, width: radii.at(state) * scale * 1pt, height: radii.at(state) * scale * 1pt),)
+    },
+    ..for (from, transitions) in spec.transitions {
+      for (to, _) in transitions {
+        (dia.edge(from, to),)
+      }
+    },
+  )
+
+  let coords = (:)
+  for node in graph.nodes {
+    coords.insert(node.name, (node.x / 1pt / scale, node.y / 1pt / scale))
+  }
+
+  return create-layout(positions: coords)
+}
