@@ -206,7 +206,7 @@
   /// -> dictionary | function
   input-labels: (:),
   /// A dictionary with styles for states and transitions.
-  /// -> dictionary | function
+  /// -> dictionary
   style: (:),
   /// A function #lambda("string", ret:"content") to format state labels.
   ///    The function will get the state's name as a string and should return the final label as #dtype("content").
