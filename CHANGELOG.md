@@ -2,6 +2,7 @@
 
 ### Version 0.5.1
 - Inputs can now be arbitrary content or have a content label assigned (#1)
+- State, transition and input labels are now part of the automaton spec.
 - Fixed individual loop styles being overriden by global styles (by @hxjerry)
 - Documentation improvements (thanks @CSharperMantle) (#23)
 - Fixes loop bug in transitions with `curve: -1` (#17)
