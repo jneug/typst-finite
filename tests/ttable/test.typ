@@ -28,6 +28,13 @@
   aut,
   fill: (c, r) => (orange, yellow).at(calc.rem(c + r, 2)),
   format: (c, r, v) => text((yellow, orange).at(calc.rem(c + r, 2)), weight: "bold", v),
+  labels: (
+    q0: [START],
+  ),
+  input-labels: (
+    a: [END],
+  ),
+  final: "a",
 )
 
 #pagebreak()
@@ -44,4 +51,15 @@
   } else {
     strong(i)
   },
+)
+
+#pagebreak()
+
+#let aut = (
+  q0: (q1: "a"),
+  q1: (q1: ("a", text(red, "d")), q2: ("c", "b")),
+  q2: (q0: "b", q2: $lambda$),
+)
+#finite.transition-table(
+  aut,
 )

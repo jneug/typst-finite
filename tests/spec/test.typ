@@ -23,16 +23,44 @@
   q19: (q20: 1),
   q20: (q21: 1),
   q21: (q22: 1),
-  q22: (q19: "λ", q23: "λ"),
+  q22: (q19: "λ", q23: "λ", q24: none),
   q23: none,
 )
 
 #let spec = finite.create-automaton(aut)
 
+#assert.eq(spec.keys().sorted(), (
+  "final",
+  "finite-spec",
+  "initial",
+  "input-labels",
+  "inputs",
+  "labels",
+  "states",
+  "transitions",
+  "type",
+))
+
 #assert.eq(spec.type, "NEA")
 #assert.eq(spec.initial, "q0")
 #assert.eq(spec.final, ("q23",))
-#assert.eq(spec.states.sorted(), aut.keys().sorted())
+#assert.eq(spec.states.sorted(), (aut.keys() + ("q24",)).sorted())
+#assert.eq(type(spec.transitions), dictionary)
+#assert.eq(spec.labels.keys().sorted(), ())
 #assert.eq(spec.inputs.sorted(), ("0", "1", "λ"))
+#assert.eq(spec.input-labels.keys().sorted(), ("λ",))
 
-#spec
+// #spec
+
+#let aut = range(6).fold(
+  (:),
+  (d, i) => {
+    d.insert("q" + str(i), ())
+    d
+  },
+)
+#let spec = finite.create-automaton(aut)
+
+
+#let spec = finite.create-automaton(aut, labels: s => if s == "q3" { "foo" })
+#assert.eq(spec.labels, ("q3": "foo"))

@@ -54,3 +54,25 @@
 #finite.automaton(aut)
 
 #finite.accepts(aut, "la1xfoo")
+
+#pagebreak()
+
+#let aut = finite.create-automaton(
+  (
+    q0: (q1: "a"),
+    q1: (q1: ("a", "b"), q2: "c"),
+    q2: (q0: "b"),
+  ),
+  labels: (
+    q0: [START],
+    q2: [END],
+  ),
+  input-labels: (
+    a: $alpha$,
+    b: $beta$,
+    c: $gamma$,
+  ),
+)
+
+#finite.automaton(aut)
+#finite.accepts(aut, "abc")

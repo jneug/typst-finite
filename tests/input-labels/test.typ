@@ -1,7 +1,7 @@
 #import "../../src/finite.typ"
+#import "../../src/util.typ"
 
 #set page(width: auto, height: auto, margin: 1cm)
-
 
 #finite.automaton(
   (q0: (q1: ("a", "b")), q1: (q0: $epsilon$)),
