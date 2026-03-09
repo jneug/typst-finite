@@ -1,17 +1,16 @@
 root := justfile_directory()
 package-fork := x'${TYPST_PKG_FORK:-}'
+
 export TYPST_ROOT := root
 
 [private]
 default:
     @just --list --unsorted
 
-# build assets
+# generate assets
 assets:
-    typst compile docs/assets/example.typ docs/assets/example.svg
-    typst compile --input theme=dark docs/assets/example.typ docs/assets/example-dark.svg
-    typst compile docs/assets/finite-logo.typ docs/assets/finite-logo.svg
-    typst compile --input theme=dark docs/assets/finite-logo.typ docs/assets/finite-logo-dark.svg
+    typst compile docs/thumbnail.typ thumbnail-light.svg
+    typst compile --input theme=dark docs/thumbnail.typ thumbnail-dark.svg
 
 # generate manual
 doc: assets
@@ -19,7 +18,7 @@ doc: assets
 
 # run test suite
 test *args:
-    tt run {{ args }}
+    tt run --warnings ignore {{ args }}
 
 # update test cases
 update *args:
@@ -35,20 +34,28 @@ install: (package "@local")
 # install the library with the "@preview" prefix (for pre-release testing)
 install-preview: (package "@preview")
 
-[private]
-[working-directory(x'${TYPST_PKG_FORK:-.}')]
-prepare-fork:
-    git checkout main
-    git pull typst main
-    git push origin --force
-
-prepare: prepare-fork (package package-fork)
-
 # create a symbolic link to this library in the target repository
 link target="@local":
     ./scripts/link "{{ target }}"
 
 link-preview: (link "@preview")
+
+# bump version number
+bump VERSION:
+  tbump {{VERSION}}
+
+[private]
+[working-directory(x'${TYPST_PKG_FORK:-.}')]
+prepare-fork:
+    echo "preparing package for relase in $TYPST_PKG_FORK"
+    git checkout main
+    git pull typst main
+    git push origin --force
+
+# prepare: (package package-fork)
+prepare: prepare-fork (package package-fork)
+
+deploy: test doc prepare
 
 [private]
 remove target:
@@ -61,10 +68,10 @@ uninstall: (remove "@local")
 uninstall-preview: (remove "@preview")
 
 # unlinks the library from the "@local" prefix
-unlink: (remove "@local")
+unlink: install uninstall
 
 # unlinks the library from the "@preview" prefix
-unlink-preview: (remove "@preview")
+unlink-preview: (install-preview) (uninstall-preview)
 
 # run ci suite
 ci: test doc
