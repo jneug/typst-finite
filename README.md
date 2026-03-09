@@ -22,12 +22,12 @@
 Import the package from the Typst preview repository:
 
 ```typst
-#import "@preview/finite:0.5.0": automaton
+#import "@preview/finite:0.5.1": automaton
 ```
 
 After importing the package, simply call `#automaton()` with a dictionary holding a transition table:
 ```typst
-#import "@preview/finite:0.5.0": automaton
+#import "@preview/finite:0.5.1": automaton
 
 #automaton(
   (
