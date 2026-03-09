@@ -475,13 +475,29 @@
 }
 
 
+/// Uses #universe("diagraph-layout") to position states.
+///
+/// #example(breakable:true)[```
+/// #let aut = range(6).fold((:), (d, s) => {d.insert("q"+str(s), (q0: 0)); d})
+/// #finite.automaton(
+///   aut,
+///   initial: none, final: none,
+///   layout: finite.layout.diagraph.with(scale: 20)
+/// )
+/// ```]
+///
+/// -> array
 #let diagraph(
   /// Automaton specification.
   /// -> spec
   spec,
-  /// Layout engine to use. See diagraph documentation.
+  /// Layout engine to use. See `diagraph-layout` documentation for details.
+  ///
+  /// The available layouts are: #finite.layout.dia.engine-list().join(", ")
   /// -> string
   engine: "neato",
+  // Scaling factor to apply to coordinates before passing them
+  // to `diagraph-layout`.
   scale: 15,
   /// Position of the anchor point.
   /// -> coordinate
@@ -489,10 +505,15 @@
   /// Styling options.
   /// -> dictionary
   style: (:),
+  /// Overrides for the positions calculated by `diagraph-layout`.
+  /// If a state is present as a key in the dictionary, its value
+  /// is used as the states position instead of the calculated one.
+  /// -> dictionary
+  overrides: (:),
+  /// Additional named `diagraph-layout` options.
+  /// -> args
   ..diagraph-args,
 ) = {
-  import "@preview/diagraph-layout:0.0.1" as dia
-
   let radii = util.get-radii(spec, style: style)
 
   let graph = dia.layout-graph(
@@ -515,10 +536,10 @@
   for node in graph.nodes {
     coords.insert(
       node.name,
-      (
+      overrides.at(node.name, default: (
         position.at(0) + node.x / 1pt / scale,
         position.at(1) + node.y / 1pt / scale,
-      ),
+      )),
     )
   }
 

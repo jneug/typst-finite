@@ -1,4 +1,3 @@
-
 #import "@preview/mantys:1.0.2": *
 
 #import "../src/finite.typ" as finite: cetz
@@ -271,7 +270,9 @@ The supported styling options (and their defaults) are as follows:
   - `label`:
     / #arg(text: ""): Transition label.
     / #arg(size: 1em): Size for label text.
-    / #arg(fill: none): Color for label text. When set to #value(none), the color is inherited from the transition's stroke color.
+    / #arg(
+        fill: none,
+      ): Color for label text. When set to #value(none), the color is inherited from the transition's stroke color.
     / #arg(
         pos: .5,
       ): Position on the transition, between #value(0) and #value(1). #value(0) sets the text at the start, #value(1) at the end of the transition.
