@@ -26,7 +26,3 @@ search = 'version = "{current_version}"'
 [[file]]
 src = "README.md"
 search = "finite:{current_version}"
-
-[[before_commit]]
-name = "compile manual"
-cmd = "just doc"
