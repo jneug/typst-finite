@@ -9,6 +9,7 @@
 - Fixed some bugs in utility functions.
 - `#accepts` now rejects all words for automata without a final state and no longer panics.
 - Bumped CeTZ to v0.4.2
+- New `diagraph` layout which uses the [diagraph-layout](https://typst.app/universe/package/diagraph-layout) package.
 
 ### Version 0.5.0
 
