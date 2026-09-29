@@ -430,7 +430,7 @@
           label = util.def.as-arr(label)
 
           if char in label {
-            to.push(name)
+            to.push(spec.labels.at(name, default: name))
           }
         }
         table-cnt.push(if to == () { "" } else { format(i + 1, row + 1, format-list(to)) })
