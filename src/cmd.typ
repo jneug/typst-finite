@@ -260,7 +260,7 @@
 
   let (coordinates, anchors) = layout(spec, style: style)
 
-  cetz.canvas(
+  let diagram = cetz.canvas(
     ..canvas-styles,
     {
       import cetz.draw: set-style
@@ -317,6 +317,12 @@
       }
     },
   )
+
+  context if "html" in dictionary(std) and target() == "html" {
+    html.frame(diagram)
+  } else {
+    diagram
+  }
 }
 
 /// Displays a transition table for an automaton.
